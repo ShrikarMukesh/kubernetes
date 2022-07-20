@@ -156,7 +156,9 @@ spec:
      - containerPort: 8080
 
 ======================================
-scp mypod1.yml ubuntu@18.117.250.254:/home/ubuntu/mypods
+scp mypod1.yml ubuntu@35.200.255.7:/home/ubuntu/mypods
+
+scp pod1.yml ubuntu@35.200.255.7:/home/ubuntu/pods1
 ============================================
 
 kubectl create -f mypod1.yml
@@ -197,6 +199,8 @@ spec:
 
 =============================================
 scp mypod2.yml ubuntu@18.117.250.254:/home/ubuntu/mypods
+
+my machine new - > scp mypod2.yml ubuntu@35.200.255.7:/home/ubuntu/pods1
 ============================================
 kubectl create -f mypod2.yml
 
@@ -206,7 +210,8 @@ kubectl get pods -o wide
 
 kubectl describe pod mypod2   
 
-kubectl logs -f mypod2 -c mytomcat        
+kubectl logs -f mypod2 -c mytomcat
+kubectl logs -f mypod2 -c mynginx
 
 kubectl exec -it mypod2  -- /bin/bash 
 kubectl exec -it mypod2 -c mynginx -- /bin/bash 

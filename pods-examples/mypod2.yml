@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod2
+spec:
+  restartPolicy: Never
+  containers:
+    - name: mynginx
+      image: nginx
+      ports:
+        - containerPort: 80
+    - name: mytomcat
+      image: tomcat
+      ports:
+        - containerPort: 8080
