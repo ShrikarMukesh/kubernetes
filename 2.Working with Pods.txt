@@ -176,11 +176,10 @@ kubectl exec -it mypod1  -- /bin/bash
 2) Pods that run multiple containers that need to work together.
 ==============================================
 =>  A Pod can contain multiple co-located containers that are tightly coupled and need to share resources. 
-=> Ex:
 
-===============
+=============================================================
 mypod2.yml
-==============
+============================================================
 apiVersion: v1
 kind: Pod
 metadata:
