@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod3
+spec:
+  containers:
+    - name: mynginx
+      image: nginx
+      ports:
+        - containerPort: 80
+    - name: mytomcat
+      image: nginx
+      ports:
+        - containerPort: 8080
+    - name: mycentos
+      image: centos
