@@ -1,0 +1,16 @@
+POD Configuration:
+-----------------------
+1) Commands are Arguments in Docker
+2) Commands are Arguments in Kubernetes
+3) Environment Variables in Docker
+4) Environment Variables in Kubernetes
+5) ConfigMaps in Kubernetes
+6) Secrets in Kubernetes
+7) Security in Docker
+8) SecurityContext in Kubernetes
+9) Service Accounts
+10) Resource Requirements
+11) Taints and Tolerations
+12) Node Selectors
+13) Node Afinity
+

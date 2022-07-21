@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mbr-identifire-rs
+  labels:
+    app: mbr-identifire
+spec:
+  replicas: 3
+  selector:
+     matchLabels:
+        app: mbr-identifire
+  template:
+    metadata:
+      name: mbr-identifire-pod
+      labels:
+        app: mbr-identifire
+    spec:
+      containers:
+        - name: mbr-identifire-container
+          image: nginx
+          ports:
+            - containerPort: 8081

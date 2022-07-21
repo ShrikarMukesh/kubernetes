@@ -35,6 +35,8 @@ kubectl describe namespaces kube-system
 
 kubectl create namespace jlc-system
 
+kubectl create namespace cep-test / cep-dev / cep-prepod / cep-prod
+
 kubectl get namespaces
 
 kubectl describe namespace jlc-system
@@ -46,12 +48,15 @@ kubectl get pods -n jlc-system
 kubectl get pods --all-namespaces        
 
 kubectl run mypod1 --image nginx  --namespace=jlc-system
+ -------------->  kubectl run mypod1 --image nginx  --namespace=cep-dev
 
 kubectl run mypod2 --image tomcat   --namespace=jlc-system
-
+--------------->  kubectl run mypod1 --image nginx  --namespace=cep-prod
 kubectl get pods
 
 kubectl get pods -n jlc-system
+
+kubectl delete namespace cep-dev ---> It will delete all the pods inside the name spaces
 
 Create a new YAML file called my-namespace.yaml with the contents:
 
@@ -65,7 +70,8 @@ metadata:
 ===============================
 scp hello-nm.yml ubuntu@18.191.136.78:/home/ubuntu/mynms
 
-
+ scp book-store-nm.yml  ubuntu@35.200.154.20:/home/ubuntu/namespaces
+ 
 kubectl create -f  hello-nm.yml
 
 
@@ -84,7 +90,9 @@ dev-nm.json
   }
 }
 
-scp dev-nm.json ubuntu@18.191.136.78:/home/ubuntu/mynms
+scp dev-nm.json ubuntu@35.200.154.20:/home/ubuntu/namespaces
+
+scp prod-nm.json ubuntu@35.200.154.20:/home/ubuntu/namespaces
 
 kubectl create -f dev-nm.json
 
@@ -111,11 +119,5 @@ kubectl get namespaces --show-labels
 
 kubectl delete namespace production
 kubectl delete namespace development
-
-
-
-
-
-          
 
 

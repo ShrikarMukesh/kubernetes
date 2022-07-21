@@ -55,7 +55,7 @@ spec:
 
 
 ===============================
-scp myreplicaset1.yml ubuntu@18.117.160.249:/home/ubuntu
+scp replicaset1.yml ubuntu@35.200.255.7:/home/ubuntu/replicasets
 
 kubectl create -f  myreplicaset1.yml
 

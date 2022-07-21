@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: myjlc-replicaset
+  labels:
+    app: myjlc
+spec:
+  selector:
+    matchLabels:
+      app: myjlc
+  replicas: 5
+  template:
+    metadata:
+      name: myjlc-pod
+      labels:
+        app: myjlc
+    spec:
+      containers:
+        - name: myjlc-container
+          image: nginx
+          ports:
+            - containerPort: 8080

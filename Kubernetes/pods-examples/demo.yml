@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pdp-tenent-app
+  labels:
+    name: pharma-data-portal
+    type: Emisar-Pods
+spec:
+  containers:
+  - name: pdp-tenent-container
+    image: ctshrikar/pdp-tenant-app:latest
+    ports:
+      - containerPort: 9090
