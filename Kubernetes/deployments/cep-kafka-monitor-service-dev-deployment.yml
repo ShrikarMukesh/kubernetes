@@ -1,2 +1,41 @@
 apiVersion: apps/v1
 kind: Deployment
+metadata:
+  labels:
+    app: cep-kafka-monitor-service
+  name: cep-kafka-monitor-service
+  namespace: cep-stage
+spec:
+  replicas: 3
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: cep-kafka-monitor-service
+      deploymentConfig: cep-kafka-monitor-service
+  strategy: {}
+  template: 
+    metadata:
+      labels:
+        app: cep-kafka-monitor-service
+        deploymentConfig: cep-kafka-monitor-service
+    spec:
+      containers:
+       - image: nginx
+         imagePullPolicy: IfNotPresent
+         name: cep-kafka-monitor-service
+         resources:
+           requests:
+            memory: "512Mi"
+            cpu: 125m
+           limits:
+             memory: "750Mi"
+             cpu: 500m
+         readinessProbe:
+         livenessProbe:
+         ports:
+          - containerPort: 8089
+         env:
+         - name: ACTIVE_PROFILE
+           value: stage
+         - name: APPLICATION_LOG_LEVEL
+           value: info
