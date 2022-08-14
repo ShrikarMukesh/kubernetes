@@ -1,0 +1,115 @@
+docker image rm -f $(docker images -aq)
+docker rm -f $(docker ps -aq) 
+docker rm -f  f81cbdfad3ab 
+
+Master :
+ssh ubuntu@18.117.160.249
+
+Configurations
+=====================================
+4) Environment Variables in Kubernetes
+=====================================
+docker tag 73b95fea60ab dandesclasses/jlcapp
+
+docker login
+
+docker push dandesclasses/jlcapp
+
+
+kubectl run jlcpod --image=dandesclasses/jlcapp  -- sleep 3600
+
+kubectl describe pod jlcpod 
+
+kubectl exec jlcpod  -it -- sh
+
+/#  env
+
+/#  echo $myname
+
+/#  echo $mycourse
+
+/#  echo $mycolor
+
+/# exit
+
+kubectl delete pod jlcpod 
+
+kubectl run jlcpod --image=dandesclasses/jlcapp --dry-run=client -o yaml -- sleep 3600 
+
+kubectl run jlcpod --image=dandesclasses/jlcapp --restart=Never --env=myname=Hello --env=mycolor=Pink -- sleep 3600
+
+kubectl run jlcpod --image=dandesclasses/jlcapp --restart=Never --env=myname=Hello --env=mycolor=Pink --dry-run=client -o yaml -- sleep 3600
+
+kubectl run jlcpod --image=dandesclasses/jlcapp --restart=Never --env=myname=Hello --env=mycolor=Pink --dry-run=client -o yaml -- sleep 3600 > mytestpod.yml
+
+kubectl get pods
+
+kubectl exec jlcpod  -it -- sh
+
+/#  env
+
+/#  echo $myname
+
+/#  echo $mycourse
+
+/#  echo $mycolor
+
+/# exit
+
+kubectl delete pod jlcpod 
+
+
+kubectl run jlcpod --image=dandesclasses/jlcapp --dry-run=client -o yaml -- sleep 3600 
+
+kubectl run jlcpod --image=dandesclasses/jlcapp --restart=Never --env=myname=Hello --env=mycolor=Pink --dry-run=client -o yaml -- sleep 3600
+
+kubectl run jlcpod --image=dandesclasses/jlcapp --restart=Never --env=myname=Hello --env=mycolor=Pink --dry-run=client -o yaml -- sleep 3600 > mypod.yml
+
+
+===============
+mypod5.yml
+==============
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+  labels:
+    run: jlcpod
+spec:
+  containers:
+   - image: dandesclasses/jlcapp
+     name: jlcpod
+     args:
+      - sleep
+      - "3600"
+     env:
+      - name: myname
+        value: Bajrang
+      - name: mycolor
+        value: Blue
+      - name: testMsg
+        value: OKOK
+  restartPolicy: Never
+
+
+
+================================
+scp mypod5.yml ubuntu@18.117.241.94:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod5.yml
+
+kubectl exec jlcpod  -it -- sh
+
+/#  env
+
+/#  echo $myname
+
+/#  echo $mycourse
+
+/#  echo $mycolor
+
+/# exit
+
+kubectl delete pod jlcpod 
+

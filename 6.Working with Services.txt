@@ -73,13 +73,13 @@ spec:
       targetPort: 8080
       nodePort: 32000
 
-================================
+=============================================================================================================================
 Node POrt Range = 30000 to 32767
-===============================
+=============================================================================================================================
 ssh ubuntu@3.21.237.205
 
-scp mydeployment.yml ubuntu@3.139.54.153:/home/ubuntu/myapp
-scp myservice.yml ubuntu@3.139.54.153:/home/ubuntu/myapp
+scp mydeployment.yml ubuntu@3.139.54.153:/home/ubuntu/myapp ---> scp mydeployment.yml ubuntu@35.200.255.7:/home/ubuntu/services
+scp myservice.yml ubuntu@3.139.54.153:/home/ubuntu/myapp  ----> scp myservice.yml ubuntu@35.200.255.7:/home/ubuntu/services
 
 kubectl create -f  mydeployment.yml
 kubectl create -f  myservice.yml
@@ -98,7 +98,7 @@ kubectl get pods --show-labels
 
 <NodeIP>:<NodePort>.
 
-http://3.139.54.153:32000/
+http://35.200.255.7:32000/
 http://18.217.122.113:32000/
 http://18.117.134.99:32000/
 
@@ -113,11 +113,11 @@ kubectl delete service myjlc-service
 kubectl delete deployment myjlc-deployment
 ========================================
 
-========================
+===================================================================
 Jlcapp Deployment  - Demo
-========================
+===================================================================
 YAML Configuration file for Deployment --- jlcapp-deployment.yml
--------------------------------------------------------
+-------------------------------------------------------------------
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -143,11 +143,11 @@ spec:
           ports:
             - containerPort: 8080
 
-========================
+====================================================================
 Jlcapp  Service Demo 
-========================
+====================================================================
 YAML Configuration file for Service: --- jlcapp-service.yml
--------------------------------------------------------
+--------------------------------------------------------------------
 apiVersion: v1
 kind: Service
 metadata:
@@ -181,7 +181,7 @@ kubectl get pods --show-labels
 
 <NodeIP>:<NodePort>.
 
-http://3.139.54.153:32000/myjlcapp
+http://10.99.129.241:32000/myjlcapp -- > http://10.99.129.241:32000/myjlcapp
 http://18.217.122.113:32000/myjlcapp
 http://18.117.134.99:32000/myjlcapp
 

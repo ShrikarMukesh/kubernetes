@@ -1,0 +1,129 @@
+Docker :
+ssh ubuntu@18.188.161.116
+
+docker images
+docker ps
+docker ps -a
+docker rm -f $(docker ps -aq) 
+docker rm -f 9e8b1a847caf 
+
+Configurations
+================
+7) Security in Docker
+================
+1) Processs Isolation
+--------------------------
+ps aux
+
+docker run -d --name=myjlc1 ubuntu sleep 1800
+ps aux
+
+root        2748  0.0  0.0   2516   584 ?        Ss   09:58   0:00 sleep 1800
+
+docker exec -it  myjlc1 /bin/bash
+
+ps aux
+
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.0  0.0   2516   584 ?        Ss   09:58   0:00 sleep 1800
+root           7  0.7  0.0   4116  3340 pts/0    Ss   09:59   0:00 /bin/bash
+root          15  0.0  0.0   5904  2756 pts/0    R+   09:59   0:00 ps aux
+
+2)User Management
+-------------------------------
+On Host
+
+sudo apt-get update
+sudo apt-get install --yes libcap2-bin
+capsh --print
+
+Bounding set =cap_chown,cap_dac_override,cap_dac_read_search,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_linux_immutable,cap_net_bind_service,cap_net_broadcast,cap_net_admin,cap_net_raw,cap_ipc_lock,cap_ipc_owner,cap_sys_module,cap_sys_rawio,cap_sys_chroot,cap_sys_ptrace,cap_sys_pacct,cap_sys_admin,cap_sys_boot,cap_sys_nice,cap_sys_resource,cap_sys_time,cap_sys_tty_config,cap_mknod,cap_lease,cap_audit_write,cap_audit_control,cap_setfcap,cap_mac_override,cap_mac_admin,cap_syslog,cap_wake_alarm,cap_block_suspend,cap_audit_read,38,39,40
+-----------------------------------------------------------------------------------
+Ex1 :
+docker run -d --name=myjlc2 --user=1000  ubuntu sleep 5000
+docker exec -it  myjlc2 /bin/bash
+
+ps aux
+
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+1000           1  0.0  0.0   2516   584 ?        Ss   10:09   0:00 sleep 5000
+1000          26  0.1  0.0   4116  3500 pts/0    Ss   10:19   0:00 /bin/bash
+1000          34  0.0  0.0   5904  2856 pts/0    R+   10:19   0:00 ps aux
+
+id 
+
+User Id/uid=1000 
+-----------------------------------------------------------------------------------
+Ex2:
+
+docker run -d --name=myjlc3  ubuntu sleep 5000
+docker exec -it  myjlc3 /bin/bash
+
+
+ps aux
+
+root           1  0.3  0.0   2512   520 ?        Ss   12:21   0:00 sleep 5000
+root           7  0.7  0.0   4112  3348 pts/0    Ss   12:21   0:00 /bin/bash
+root          15  0.0  0.0   5900  2900 pts/0    R+   12:21   0:00 ps aux
+
+id 
+uid=0(root) gid=0(root) groups=0(root)
+
+apt-get update
+apt-get install --yes libcap2-bin
+capsh --print
+
+Bounding set =cap_chown,cap_dac_override,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_net_bind_service,cap_net_raw,cap_sys_chroot,cap_mknod,cap_audit_write,cap_setfcap
+
+-------------------------------------------------------------------------------------
+Ex3:
+
+docker run -d --name=myjlc4  --cap-add MAC_ADMIN ubuntu sleep 5000
+docker exec -it  myjlc4 /bin/bash
+
+ps aux
+
+id 
+uid=0(root) gid=0(root) groups=0(root)
+
+apt-get update
+apt-get install --yes libcap2-bin
+capsh --print
+
+Bounding set =cap_chown,cap_dac_override,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_net_bind_service,cap_net_raw,cap_sys_chroot,cap_mknod,cap_audit_write,cap_setfcap,cap_mac_admin
+-------------------------------------------------------------------------------------
+Ex 4: 
+docker run -d --name=myjlc5  --cap-add MAC_ADMIN --cap-drop KILL --cap-drop CHOWN ubuntu sleep 5000
+docker exec -it  myjlc5 /bin/bash
+
+ps aux
+
+id 
+uid=0(root) gid=0(root) groups=0(root)
+
+apt-get update
+apt-get install --yes libcap2-bin
+capsh --print
+
+Bounding set =cap_dac_override,cap_fowner,cap_fsetid,cap_setgid,cap_setuid,cap_setpcap,cap_net_bind_service,cap_net_raw,cap_sys_chroot,cap_mknod,cap_audit_write,cap_setfcap,cap_mac_admin
+---------------------------------------------------------------------------------------------------------------
+Ex 5: 
+
+docker run -d --name=myjlc6  --privileged ubuntu sleep 5000
+docker exec -it  myjlc6 /bin/bash
+
+apt-get update
+apt-get install --yes libcap2-bin
+capsh --print
+
+Bounding set =cap_chown,cap_dac_override,cap_dac_read_search,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_linux_immutable,cap_net_bind_service,cap_net_broadcast,cap_net_admin,cap_net_raw,cap_ipc_lock,cap_ipc_owner,cap_sys_module,cap_sys_rawio,cap_sys_chroot,cap_sys_ptrace,cap_sys_pacct,cap_sys_admin,cap_sys_boot,cap_sys_nice,cap_sys_resource,cap_sys_time,cap_sys_tty_config,cap_mknod,cap_lease,cap_audit_write,cap_audit_control,cap_setfcap,cap_mac_override,cap_mac_admin,cap_syslog,cap_wake_alarm,cap_block_suspend,cap_audit_read
+-----------------------------------------------------------------------------------------------------
+======================================
+On Host
+
+ps aux | grep sleep
+
+docker rm -f $(docker ps -aq) 
+
+ps aux | grep sleep
+

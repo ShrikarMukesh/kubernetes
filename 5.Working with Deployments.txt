@@ -38,6 +38,58 @@ spec:
 ===============================
 scp myreplicaset1.yml ubuntu@18.117.160.249:/home/ubuntu
 
+==========================================================================
+kubectl get deployment -n cep-stage
+
+kubectl create -f cep-kafka-monitor-service-dev-deployment.yml
+
+kubectl delete deployment cep-kafka-monitor-service -n cep-stage
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cep-kafka-monitor-service
+  name: cep-kafka-monitor-service
+  namespace: cep-stage
+spec:
+  replicas: 3
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: cep-kafka-monitor-service
+      deploymentConfig: cep-kafka-monitor-service
+  strategy: {}
+  template: 
+    metadata:
+      labels:
+        app: cep-kafka-monitor-service
+        deploymentConfig: cep-kafka-monitor-service
+    spec:
+      containers:
+       - image: nginx
+         imagePullPolicy: IfNotPresent
+         name: cep-kafka-monitor-service
+         resources:
+           requests:
+            memory: "512Mi"
+            cpu: 125m
+           limits:
+             memory: "750Mi"
+             cpu: 500m
+         readinessProbe:
+         livenessProbe:
+         ports:
+          - containerPort: 8089
+         env:
+         - name: ACTIVE_PROFILE
+           value: stage
+         - name: APPLICATION_LOG_LEVEL
+           value: info
+   
+============================================================================================================
+
 kubectl create -f  mydeployment.yml
 
 kubectl get pods
@@ -52,16 +104,16 @@ kubectl get pods -o wide
 
 kubectl get pods --show-labels
 
-kubectl describe deployment myjlc-deployment
+kubectl describe deployment myjlc-deployment   --- >  kubectl create -f cep-kafka-monitor-service-dev-deployment.yml
 
-kubectl describe replicaset myjlc-deployment-5965c7b654
+kubectl describe replicaset myjlc-deployment-5965c7b654 --> kubectl describe replicaset cep-kafka-monitor-service-6886d76665 -n cep-stage
 
-kubectl describe pod myjlc-deployment-5965c7b654-4csvx
+kubectl describe pod myjlc-deployment-5965c7b654-4csvx --> kubectl describe replicaset cep-kafka-monitor-service-6886d76665 -n cep-stage
 
 =====================================
 kubectl get pods 
 
-kubectl scale replicaset myjlc-deployment-5965c7b654  --replicas=7
+kubectl scale replicaset myjlc-deployment-5965c7b654  --replicas=7 -> kubectl scale replicaset cep-kafka-monitor-service-6886d76665 --replicas=7 -namespace cep-stage
 
 kubectl get pods 
 
@@ -74,6 +126,54 @@ kubectl delete replicaset myjlc-deployment-5965c7b654
 kubectl get pods 
 
 
+kubectl get deployments -n cep-stage
+kubectl describe deployment cep-kafka-monitor-service -n cep-stage
+
+ubuntu@jenkins-server:~$ kubectl describe deployment cep-kafka-monitor-service -n cep-stage
+Name:                   cep-kafka-monitor-service
+Namespace:              cep-stage
+CreationTimestamp:      Thu, 21 Jul 2022 13:18:36 +0000
+Labels:                 app=cep-kafka-monitor-service
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=cep-kafka-monitor-service,deploymentConfig=cep-kafka-monitor-service
+Replicas:               3 desired | 3 updated | 3 total | 3 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=cep-kafka-monitor-service
+           deploymentConfig=cep-kafka-monitor-service
+  Containers:
+   cep-kafka-monitor-service:
+    Image:      nginx
+    Port:       8089/TCP
+    Host Port:  0/TCP
+    Limits:
+      cpu:     500m
+      memory:  750Mi
+    Requests:
+      cpu:     125m
+      memory:  512Mi
+    Environment:
+      ACTIVE_PROFILE:         stage
+      APPLICATION_LOG_LEVEL:  info
+    Mounts:                   <none>
+  Volumes:                    <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   cep-kafka-monitor-service-6886d76665 (3/3 replicas created)
+Events:
+  Type    Reason             Age    From                   Message
+  ----    ------             ----   ----                   -------
+  Normal  ScalingReplicaSet  3h54m  deployment-controller  Scaled up replica set cep-kafka-monitor-service-6886d76665 to 3
+  Normal  ScalingReplicaSet  3m53s  deployment-controller  Scaled down replica set cep-kafka-monitor-service-6886d76665 to 3
+
+
+
 Rollouts and Vesrions:
 -------------------------------
 kubectl rollout status deployment/myjlc-deployment
@@ -83,19 +183,26 @@ kubectl rollout history deployment/myjlc-deployment
 
 Updating a Deployment
 --------------------------------
-kubectl set image deployment/myjlc-deployment myjlc-container=nginx:1.20.2
+ 
+kubectl set image deployment/myjlc-deployment myjlc-container=nginx:1.20.2  --> kubectl set image deployment/cep-kafka-monitor-service cep-kafka-monitor-service=nginx:1.20.2 -n cep-stage
 
-kubectl rollout history deployment/myjlc-deployment
+ubuntu@jenkins-server:~$ kubectl get rs -n cep-stage
+NAME                                   DESIRED   CURRENT   READY   AGE
+cep-kafka-monitor-service-6886d76665   0         0         0       3h58m
+cep-kafka-monitor-service-c7f67bdfb    3         3         3       59s
 
-kubectl rollout status deployment/myjlc-deployment
 
-kubectl rollout undo deployment/myjlc-deployment
+kubectl rollout history deployment/myjlc-deployment --> kubectl rollout history deployment/cep-kafka-monitor-service -n cep-stage 
+
+kubectl rollout status deployment/myjlc-deployment --> kubectl rollout status deployment/cep-kafka-monitor-service -n cep-stage
+
+kubectl rollout undo deployment/myjlc-deployment --> kubectl rollout undo deployment/cep-kafka-monitor-service -n cep-stage
 
 Scaling a Deployment 
 ------------------------------
 kubectl get pods 
 
-kubectl scale deployment/myjlc-deployment --replicas=10
+kubectl scale deployment/myjlc-deployment --replicas=10 -> kubectl scale deployment/cep-kafka-monitor-service --replicas=10
 
 kubectl get pods 
 

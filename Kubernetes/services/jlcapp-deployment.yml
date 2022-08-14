@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jlcapp-deployment
+spec:
+  strategy:
+    type: RollingUpdate 
+  selector:
+    matchLabels:
+      app: myjlc-app
+      type: front-end
+  replicas: 2
+  template:
+    metadata:
+      name: myjlc-app
+      labels:
+        app: myjlc-app
+        type: front-end
+    spec:
+      containers:
+        - name: jlcapp-container
+          image: dandesclasses/myjlcapp:v1.0
+          ports:
+            - containerPort: 8080

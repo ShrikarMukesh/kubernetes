@@ -1,0 +1,162 @@
+docker image rm -f $(docker images -aq)
+docker rm -f $(docker ps -aq) 
+docker rm -f  f81cbdfad3ab 
+
+Master :
+ssh ubuntu@18.117.160.249
+
+Configurations
+=====================================
+3) Environment Variables in Docker
+=====================================
+
+===================
+mydockerFile
+===================
+FROM ubuntu
+LABEL maintainer Srinivas
+
+ENV myname "Srinivas"
+ENV mycourse "DevOps"
+ENV mycolor "Red"
+
+CMD [ "bash" ]
+
+==========================
+
+docker build -t jlcapp -f mydockerFile .
+
+docker history jlcapp
+
+docker run -it jlcapp  /bin/bash
+
+root@43dbe99669f6:/# env 
+root@43dbe99669f6:/# echo $myname
+root@43dbe99669f6:/# echo $mycourse
+root@43dbe99669f6:/# echo $mycolor
+
+docker run -it --env myname=Dandes --env msg=Hello jlcapp  /bin/bash
+
+echo $myname
+echo $mycourse
+echo $mycolor
+
+docker run -it  -e myname=Dandes -e mycolor=Blue jlcapp  /bin/bash
+
+echo $myname
+echo $mycourse
+echo $mycolor
+
+
+docker rm -f  $(docker ps -aq) 
+docker image rm -f 7bf33fad32f2
+
+=====================================
+4) Environment Variables in Kubernetes
+=====================================
+docker tag 73b95fea60ab dandesclasses/jlcapp
+
+docker login
+
+docker push dandesclasses/jlcapp
+
+
+kubectl run jlcpod --image=dandesclasses/jlcapp  -- sleep 3600
+
+kubectl describe pod jlcpod 
+
+kubectl exec jlcpod  -it -- sh
+
+/#  env
+
+/#  echo $myname
+
+/#  echo $mycourse
+
+/#  echo $mycolor
+
+/# exit
+
+kubectl delete pod jlcpod 
+
+kubectl run jlcpod --image=dandesclasses/jlcapp --dry-run=client -o yaml -- sleep 3600 
+
+kubectl run jlcpod --image=dandesclasses/jlcapp --restart=Never --env=myname=Hello --env=mycolor=Pink -- sleep 3600
+
+kubectl run jlcpod --image=dandesclasses/jlcapp --restart=Never --env=myname=Hello --env=mycolor=Pink --dry-run=client -o yaml -- sleep 3600
+
+kubectl run jlcpod --image=dandesclasses/jlcapp --restart=Never --env=myname=Hello --env=mycolor=Pink --dry-run=client -o yaml -- sleep 3600 > mytestpod.yml
+
+kubectl get pods
+
+kubectl exec jlcpod  -it -- sh
+
+/#  env
+
+/#  echo $myname
+
+/#  echo $mycourse
+
+/#  echo $mycolor
+
+/# exit
+
+kubectl delete pod jlcpod 
+
+
+kubectl run jlcpod --image=dandesclasses/jlcapp --dry-run=client -o yaml -- sleep 3600 
+
+kubectl run jlcpod --image=dandesclasses/jlcapp --restart=Never --env=myname=Hello --env=mycolor=Pink --dry-run=client -o yaml -- sleep 3600
+
+kubectl run jlcpod --image=dandesclasses/jlcapp --restart=Never --env=myname=Hello --env=mycolor=Pink --dry-run=client -o yaml -- sleep 3600 > mypod.yml
+
+
+===============
+mypod5.yml
+==============
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+  labels:
+    run: jlcpod
+spec:
+  containers:
+   - image: dandesclasses/jlcapp
+     name: jlcpod
+     args:
+      - sleep
+      - "3600"
+     env:
+      - name: myname
+        value: Bajrang
+      - name: mycolor
+        value: Blue
+      - name: testMsg
+        value: OKOK
+  restartPolicy: Never
+
+
+
+================================
+scp mypod5.yml ubuntu@18.117.241.94:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod5.yml
+
+kubectl exec jlcpod  -it -- sh
+
+/#  env
+
+/#  echo $myname
+
+/#  echo $mycourse
+
+/#  echo $mycolor
+
+/# exit
+
+kubectl delete pod jlcpod 
+=====================================================================
+https://www.youtube.com/playlist?list=PLPIVZsyfpXt-wyNY65-aC9Vm_PEsM3pR8
+

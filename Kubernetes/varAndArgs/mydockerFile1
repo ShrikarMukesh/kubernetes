@@ -1,0 +1,7 @@
+FROM openjdk:8
+LABEL maintainer Srinivas
+RUN mkdir /home/myjlc
+COPY Hello.java /home/myjlc
+WORKDIR /home/myjlc
+RUN javac Hello.java
+ENTRYPOINT ["java","Hello"]

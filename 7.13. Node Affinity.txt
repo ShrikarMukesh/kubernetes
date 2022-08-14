@@ -1,0 +1,136 @@
+Master :
+ssh ubuntu@18.191.206.86
+
+Configurations
+================================
+13) Node Affinity
+================================
+Assign Pods to Nodes using Node Affinity
+
+Node Selector is Simplest way of Scheduling the Based on the Labels and Selectors.
+
+If you have complex Requirements like 
+=> size may be medium or small
+=> ostype may be windows
+
+then Node Selector is not suitable .
+You have Node Affinity for Complex Use Cases.
+
+Ex:
+kubectl label nodes worker-1 myappType=jlcbank
+kubectl label nodes worker-2 myappType=jlcbs
+
+============================
+mypod31.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: mynginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: myappType
+            operator: "In"
+            values:
+            - jlcbs
+ 
+
+=======================================
+scp mypod31.yml ubuntu@18.191.206.86:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod31.yml
+
+kubectl get pods -o wide
+
+kubectl get nodes -o wide --show-labels
+
+kubectl describe pod jlcpod
+
+kubectl delete pod jlcpod
+
+============================
+mypod32.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: mynginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+    
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: myappType
+            operator: "Equal"
+            values:
+            - jlcbank
+ 
+=======================================
+scp mypod32.yml ubuntu@18.191.206.86:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod32.yml
+
+kubectl get pods -o wide
+
+kubectl describe pod jlcpod
+
+kubectl delete pod jlcpod
+
+============================
+mypod33.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: mynginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+    
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: myappType
+            operator: "Equal"
+            values:
+            - helloApp
+ 
+=======================================
+scp mypod33.yml ubuntu@18.191.206.86:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod33.yml
+
+kubectl get pods -o wide
+
+kubectl describe pod jlcpod
+
+kubectl delete pod jlcpod
+
+
+
+======================================
+requiredDuringSchedulingIgnoredDuringExecution:
+requiredDuringSchedulingRequiredDuringExecution:
+
+
