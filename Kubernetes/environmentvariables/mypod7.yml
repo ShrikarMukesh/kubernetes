@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+  labels:
+    run: jlcpod
+spec: 
+  containers:
+   - image: nginx
+     name: jlcpod
+     env: 
+      - name: JLC_NAME
+        valueFrom:
+          configMapKeyRef:
+            name: app-config1
+            key: myname
+      - name: JLC_COURSE
+        valueFrom:
+          configMapKeyRef:
+            name: app-config1
+            key: mycourse
+      - name: JLC_USERNAME
+        valueFrom:
+          configMapKeyRef:
+            name: db-config
+            key: DB_USERNAME
+      - name: JLC_PASSWORD
+        valueFrom:
+          configMapKeyRef:
+            name: db-config
+            key: DB_PASSWORD

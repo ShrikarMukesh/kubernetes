@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shrikarpod
+  labels:
+    run: shrikarpod
+spec: 
+  containers:
+   - image: nginx
+     name: shrikarpod
+     env: 
+      - name: MY_NAME
+        valueFrom:
+          configMapKeyRef:
+            name: basic-config
+            key: myname
+      - name: MY_COURSE
+        valueFrom:
+          configMapKeyRef:
+            name: basic-config
+            key: mycourse
+      - name: MYSQL_DB_USERNAME
+        valueFrom:
+          configMapKeyRef:
+            name: db-config
+            key: DB_USERNAME
+      - name: MYSQL_DB_PASSWORD
+        valueFrom:
+          configMapKeyRef:
+            name: db-config
+            key: DB_PASSWORD

@@ -105,7 +105,7 @@ spec:
      name: jlcpod
      envFrom: 
       - configMapRef:
-          name: app-config
+          name: app-config1
       - configMapRef:
           name: db-config
       
@@ -128,35 +128,35 @@ kubectl exec jlcpod  -it -- sh
 kubectl delete pod jlcpod 
 
 ==========================================================
-mypod7.yml
+env_variable_pod_exmp.yml
 ==============
 apiVersion: v1
 kind: Pod
 metadata:
-  name: jlcpod
+  name: shrikarpod
   labels:
-    run: jlcpod
+    run: shrikarpod
 spec: 
   containers:
    - image: nginx
-     name: jlcpod
+     name: shrikarpod
      env: 
-      - name: JLC_NAME
+      - name: MY_NAME
         valueFrom:
           configMapKeyRef:
-            name: app-config
+            name: basic-config
             key: myname
-      - name: JLC_COURSE
+      - name: MY_COURSE
         valueFrom:
           configMapKeyRef:
-            name: app-config
+            name: basic-config
             key: mycourse
-      - name: JLC_USERNAME
+      - name: MYSQL_DB_USERNAME
         valueFrom:
           configMapKeyRef:
             name: db-config
             key: DB_USERNAME
-      - name: JLC_PASSWORD
+      - name: MYSQL_DB_PASSWORD
         valueFrom:
           configMapKeyRef:
             name: db-config
@@ -167,9 +167,9 @@ scp mypod7.yml ubuntu@18.219.235.44:/home/ubuntu/myconfig
 
 kubectl create -f mypod7.yml
 
-kubectl describe pod jlcpod
+kubectl describe pod shrikarpod
 
-kubectl exec jlcpod -- printenv
+kubectl exec shrikarpod -- printenv
 
 kubectl exec jlcpod  -it -- sh
 
