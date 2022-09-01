@@ -35,7 +35,7 @@ root@43dbe99669f6:/# echo $myname
 root@43dbe99669f6:/# echo $mycourse
 root@43dbe99669f6:/# echo $mycolor
 
-docker run -it --env myname=Dandes --env msg=Hello jlcapp  /bin/bash
+docker run -it --env myname=Dandes --env msg=Hello myjlcapp  /bin/bash
 
 echo $myname
 echo $mycourse

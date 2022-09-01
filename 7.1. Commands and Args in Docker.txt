@@ -28,7 +28,7 @@ WORKDIR /home/myjlc
 RUN javac Hello.java
 ENTRYPOINT ["java","Hello"]
 
-docker build -t myapp1 -f mydockerFile1 ./mycode
+docker build -t myapp1 -f mydockerfile1 ./mycode
 
 docker history myapp1
 

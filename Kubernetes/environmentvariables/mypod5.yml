@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+  labels:
+    run: jlcpod
+spec:
+  containers:
+   - image: dandesclasses/jlcapp
+     name: jlcpod
+     args:
+      - sleep
+      - "3600"
+     env:
+      - name: myname
+        value: Bajrang
+      - name: mycolor
+        value: Blue
+      - name: testMsg
+        value: OKOK
+  restartPolicy: Never

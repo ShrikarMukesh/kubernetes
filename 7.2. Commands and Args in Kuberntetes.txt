@@ -10,7 +10,7 @@ Configurations
 2) Commands and Arguments in Kubernetes
 ====================================
 
-docker tag 24ad2dee0feb dandesclasses/myapp
+docker tag 4c9336c900fc dandesclasses/myapp
 
 docker login
 
@@ -29,7 +29,7 @@ spec:
     image: dandesclasses/myapp
 
 ================================
-scp mypod1.yml ubuntu@18.117.241.94:/home/ubuntu/myconfig
+scp mypod1.yml ubuntu@34.100.163.120:/home/ubuntu/var_args
 =============================
 
 kubectl create -f mypod1.yml

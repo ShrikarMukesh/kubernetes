@@ -13,7 +13,7 @@ kubectl get configmaps
 ============================
 1) Passing Individual Variables
 -------------------------------------
-kubectl create configmap app-config1 --from-literal=myname=Srinivas  --from-literal=mycolor=Red
+kubectl create configmap app-config1 --from-literal=dbusername=Srinivas  --from-literal=dbuserpassword=Red
 
 kubectl get configmaps
 

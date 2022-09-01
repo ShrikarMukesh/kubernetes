@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod1
+spec:
+  restartPolicy: Never
+  containers:
+  - name: myjlc1
+    image: dandesclasses/myapp
