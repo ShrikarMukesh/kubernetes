@@ -1,0 +1,34 @@
+**pod: commands
+--------------------------
+watch -t -x kubectl get pod
+kubectl create -f 01-simple.yaml
+kubectl delete pod my-pod
+kubectl get pods
+
+kubectl describe pod my-pod
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  74s   default-scheduler  Successfully assigned default/my-pod to dev-cluster-worker2
+  Normal  Pulling    73s   kubelet            Pulling image "nginx"
+  Normal  Pulled     51s   kubelet            Successfully pulled image "nginx" in 22.336004387s (22.336011928s including waiting)
+  Normal  Created    51s   kubelet            Created container nginx
+  Normal  Started    51s   kubelet            Started container nginx
+
+  ------------------------
+** pod status
+Pending: Node is yet to be assigned
+ContainerCreating: Kubelet is working on creating container
+Running: Kubelet started the container
+ErrImagePull / ImagePullBackOff : Failed pulling image. Kubelet will retry with some delay
+Completed: Container exited successfully
+Error : Container exited with error
+CrashLoopBackOff: There is a problem in running the container. Kubelet is retrying with delay.(no issues in pulling the image)
+Terminating : Pod is getting deleted
+
+kubectl get pod --show-labels
+
+kubectl get pod -l dept=dept-2
+------------------------------------------------
+kubectl get pod -o wide 
+kubectl get pod <pod-name> -o yaml
