@@ -1,0 +1,157 @@
+Master :
+ssh ubuntu@18.117.124.78
+
+Configurations
+================================
+11) Taints and Tolerations
+================================
+=> Taints are applied Nodes.
+
+=> Tolerations are applied to pods, and allow the pods to schedule onto nodes with matching taints.
+
+=> Taints and tolerations work together to ensure that pods are not scheduled onto inappropriate nodes. 
+
+=> One or more taints can be applied to a node
+=>  this marks that the node should not accept any pods that do not tolerate the taints.
+
+A) Add the Taints to Node
+=================
+You can add a taint to a node as follows
+
+Syntax:
+
+kubectl taint nodes node-Name key1=value1:NoSchedule
+
+This means that no pod will be able to schedule onto node1 unless it has a matching toleration.
+
+Ex:
+kubectl taint nodes worker-1 app-name=jlcbank:NoSchedule
+kubectl taint nodes worker-2 app-name=jlcbs:NoSchedule
+
+B) Remove the Taints from Node
+=========================
+You can remove the taint added to the node as follows
+
+Syntax:
+kubectl taint nodes node1 key1=value1:NoSchedule-
+
+Ex:
+kubectl taint nodes worker-1 app-name=jlcbank:NoSchedule-
+kubectl taint nodes worker-2 app-name=jlcbs:NoSchedule-
+
+Specify the Toleration to Pod
+========================
+You specify a toleration for a pod in the PodSpec. 
+
+tolerations:
+- key: "key1"
+  operator: "Equal"
+  value: "value1"
+  effect: "NoSchedule"
+
+Ex:
+  tolerations:
+  - key: "app-name"
+    operator: "Equal"
+    value: "jlcbs"
+    effect: "NoSchedule"
+
+
+============================
+mypod25.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod1
+spec:
+  containers:
+  - name: mynginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  tolerations:
+  - key: "app-name"
+    operator: "Equal"
+    value: "jlcbs"
+    effect: "NoSchedule"
+
+
+=======================================
+scp mypod25.yml ubuntu@18.117.124.78:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod25.yml
+
+kubectl get pods -o wide
+
+kubectl describe pod jlcpod1
+
+kubectl delete pod jlcpod1
+
+============================
+mypod26.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: mynginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  tolerations:
+  - key: "app-name"
+    operator: "Equal"
+    value: "jlcbank"
+    effect: "NoSchedule"
+
+
+=======================================
+scp mypod26.yml ubuntu@18.117.124.78:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod26.yml
+
+kubectl get pods -o wide
+
+kubectl describe pod jlcpod1
+
+kubectl delete pod jlcpod1
+
+============================
+mypod27.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: mynginx
+    image: nginx
+  tolerations:
+  - key: "app-name"
+    operator: "Equal"
+    value: "hellapp"
+    effect: "NoSchedule"
+
+
+=======================================
+scp mypod27.yml ubuntu@18.117.124.78:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod27.yml
+
+kubectl get pods -o wide
+
+kubectl describe pod jlcpod
+
+kubectl delete pod jlcpod
+
+=======================================
+kubectl taint nodes worker-2 app-type=helloapp:NoSchedule
+kubectl taint nodes worker-2 app-type=helloapp:NoSchedule-
+
+
+

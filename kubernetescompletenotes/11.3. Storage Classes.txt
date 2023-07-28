@@ -1,0 +1,107 @@
+Master 
+ssh ubuntu@18.221.255.32
+
+State Persistence
+==================
+11.3. Storage Classes
+==================
+
+Static Provisioning
+
+Dynamic Provisioning:
+------------------------------
+You can define Dynamic Provisioning using Storage Classes.
+
+===================
+mysc.yml - Storage Classe(SC) Definition
+===================
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: myjlc-aws-storage
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+reclaimPolicy: Retain
+
+
+
+=======================================
+scp mysc.yml ubuntu@18.221.255.32:/home/ubuntu/myvolumes
+=============================
+
+kubectl create -f mysc.yml 
+
+kubectl get storageclasses
+
+kubectl describe storageclass myjlc-aws-storage
+
+kubectl delete storageclass  myjlc-aws-storage
+
+==============
+mypvc-2.yml - Persistent Volume Claim(PVC)  Definition 
+==============
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myjlc-pvc-2
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: myjlc-aws-storage
+
+
+======================================
+scp mypvc-2.yml ubuntu@18.221.255.32:/home/ubuntu/myvolumes
+=============================
+
+kubectl create -f mypvc-2.yml 
+
+kubectl get persistentvolumeclaims
+
+kubectl describe persistentvolumeclaim myjlc-pvc-2
+
+kubectl delete persistentvolumeclaim myjlc-pvc-2
+
+============================
+mypod55.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+
+  volumes:
+    - name: jlc-volume
+      persistentVolumeClaim:
+        claimName: myjlc-pvc-2 
+
+  containers:
+   - name: jlc1
+     image: ubuntu
+     command:
+      - "bin/bash"
+      - "-c"
+      - "sleep 10000"
+     volumeMounts:
+      - name: jlc-volume
+        mountPath: "/tmp/jlc1-data"
+
+=======================================
+scp mypod55.yml ubuntu@18.221.255.32:/home/ubuntu/myvolumes
+=============================
+
+kubectl create -f mypod55.yml
+
+kubectl get pods
+
+kubectl describe pod jlcpod
+
+kubectl exec jlcpod  -it -- sh
+
+kubectl delete pod jlcpod 
+
+
+cloud_provider:
+    name: aws

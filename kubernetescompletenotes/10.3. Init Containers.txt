@@ -1,0 +1,74 @@
+Master :
+ssh ubuntu@18.117.190.156
+
+Multi-Container Pods
+================================
+10.3. Init Containers
+================================
+=> Init Containers are specialized containers that run before app containers in a Pod. 
+=> Init containers can contain utilities or setup scripts not present in an app image.
+
+=> You can specify init containers in the Pod specification alongside the containers array
+
+=> Pod can have multiple containers running apps within it, but it can also have one or more init containers, which are run before the app containers are started.
+
+=> Init containers are exactly like regular containers, except:
+
+1) Init containers always run to completion.
+2) Each init container must complete successfully before the next one starts.
+3) If a Pod's init container fails, the kubelet repeatedly restarts that init container until it succeeds. However, if the Pod has a restartPolicy of Never, and an init container fails during startup of that Pod, Kubernetes treats the overall Pod as failed.
+4) Pod cannot be Ready until all init containers have succeeded
+
+
+============================
+mypod46.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  restartPolicy: Never
+  volumes:
+  - name: myjlc-volume
+    emptyDir: {}
+
+  containers:
+  - name: nginx-container
+    image: nginx
+    volumeMounts:
+    - name: myjlc-volume
+      mountPath: /usr/share/nginx/html
+      
+  initContainers:
+  - name: ubuntu-container
+    image: ubuntu
+    volumeMounts:
+    - name: myjlc-volume
+      mountPath: /mydata
+    command: ["/bin/sh"]
+    args: ["-c", "echo Hello JLC Guys !!! I am from Init Container > /mydata/index.html"]
+    
+=======================================
+scp mypod46.yml ubuntu@18.117.190.156:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod46.yml
+
+kubectl get pods
+
+kubectl describe pod jlcpod
+
+
+kubectl exec jlcpod -c nginx-container --  cat /usr/share/nginx/html/index.html
+
+kubectl exec jlcpod -c ubuntu-container --  cat /mydata/index.html
+
+kubectl delete pod jlcpod
+
+
+Init Containers  Vs Sidecar Containers Vs Main Container
+---------------------------------------------------------------------------
+=> Init containers run and exit before your main application starts
+=> Sidecars run side-by-side with your main container(s) and provide some kind of service for them.
+=> Main Container runs and provides the service to end users

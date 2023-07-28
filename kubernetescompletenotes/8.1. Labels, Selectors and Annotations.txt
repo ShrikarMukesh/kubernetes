@@ -1,0 +1,146 @@
+Master 
+ssh ubuntu@3.142.209.215
+
+
+8. Pod Design
+============================
+8.1) Labels, Selectors, and Annotations
+============================
+A) Labels:
+----------
+=> Labels are simple key: value pairs 
+=> Labels are attached to Kubernetes objects likes Pods, Replica Sets, Services etc
+=> Labels are used for organizing nad selecting of subsets of Kubernetes objects
+=> Labels are queryable
+
+B) Selectors:
+----------------
+=>  Query is a label selector. 
+=> A label selector is a string that identifies which labels you are trying to match.
+
+C) Annotations
+-------------------
+=> Annotations are bits of useful information you might want to store about a pod 
+
+Ex:
+Build Date, Build Version, Email etc
+
+Labels are used to store identifying information about a thing that you might need to query against. Annotations are used to store other arbitrary information that you will not have to query against.
+
+========================
+mypod34.yml    - Pod Configuration
+========================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+  labels:
+    appName: myjlcbs
+    layer: frontend
+  annotations:
+    author: Srinivas
+    buildVersion: "1.9"
+    
+spec:
+  containers:
+   - name: myjlc-container
+     image: nginx
+     ports:
+       - containerPort: 8080
+
+========================================================
+scp mypod34.yml ubuntu@18.117.160.249:/home/ubuntu/pod-design
+========================================================
+kubectl create -f  mypod34.yml 
+
+kubectl get pods
+
+kubectl get pods --show-labels
+
+kubectl describe pod jlcpod
+
+kubectl delete pod jlcpod
+
+kubectl label <resource-type> <resource-name> <label-key>=<value>
+
+kubectl label pod jlcpod env=production
+
+kubectl label <resource-type> <resource-name> <label-key>-
+
+kubectl label pod jlcpod env-
+
+========================
+myreplicaset.yml   - ReplicaSet Configuration
+========================
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: myjlc-replicatset
+  labels:
+    app: jlc-book-store
+  annotations:
+    author: Srinivas Dande
+    buildVersion: "2.9"
+spec:
+  selector:
+    matchLabels:
+       appName: myjlcbs
+       layer: frontend
+  replicas: 2
+  template:
+    metadata:
+      name: myjlc-pod
+      labels:
+        appName: myjlcbs
+        layer: frontend
+      annotations:
+        author: Srinivas
+        buildVersion: "1.9"
+    spec:
+      containers:
+        - name: myjlc-container
+          image: nginx
+          ports:
+            - containerPort: 8080
+
+========================================================
+scp myreplicaset.yml ubuntu@18.117.160.249:/home/ubuntu/pod-design
+========================================================
+
+kubectl create -f  myreplicaset.yml
+
+kubectl get replicasets
+
+kubectl get replicasets --show-labels
+
+kubectl get pods
+
+kubectl get pods --show-labels
+
+kubectl describe replicaset myjlc-replicatset
+
+kubectl label <resource-type> <resource-name> <label-key>=<value>
+
+kubectl label replicaset myjlc-replicatset env=production
+
+kubectl label <resource-type> <resource-name> <label-key>-
+
+kubectl label replicaset myjlc-replicatset env-
+
+
+
+kubectl get pods --selector "app=dev"
+kubectl get pods --selector "tier=backend"
+kubectl get replicasets --selector "app=prod"
+
+
+
+Deleting a ReplicaSet
+------------------------------
+kubectl delete replicaset myjlc-replicatset
+
+kubectl label node <nodename> <labelname>-
+
+
+
+

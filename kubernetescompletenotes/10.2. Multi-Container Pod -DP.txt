@@ -1,0 +1,42 @@
+Multi-Container Pods
+================================
+10.2. Multi-Container Pod design patterns
+================================
+
+1)Sidecar Design Pattern
+2) Adapter Design Pattern
+3) Ambassador  Design Pattern
+
+====================
+1)Sidecar Design Pattern
+====================
+=> Sidecar containers helps or extend or enhance the "main" container, 
+=> Sidecar container is important for your application but not necessarily required for running main  application 
+
+Ex:
+=> One Container that runs the jlcbook store application in Tomcat 
+=> Another container that sends the log files to bucket.  
+
+====================
+2) Adapter Design Pattern
+====================
+=> Adapter containers standardize and normalize output.  
+=> Consider the task of monitoring N different applications.  
+=> Each application may be built with a different way of exporting monitoring data. but every monitoring system expects a consistent and uniform data model for the monitoring data.
+
+=> By using the adapter pattern of composite containers, you can transform the heterogeneous monitoring data from different systems into a single unified representation by creating Pods that groups the application containers with adapters that know how to do the transformation.  
+
+Ex:
+=> One Container that runs the jlcbook store application in Tomcat 
+=> Another container that Monitoring Adapter.  
+
+====================
+3) Ambassador  Design Pattern
+====================
+=> Ambassador design pattern is used to connect containers with the outside world. 
+=> Ambassador containers proxy a local connection to the world
+=> In this design pattern, the helper container can send network requests on behalf of the main application. It is nothing but a proxy that allows other containers to connect to a port on the localhost. 
+
+Ex:
+=> One Container that runs the jlcbook store application in Tomcat 
+=> Another container that proxies database connections

@@ -1,0 +1,67 @@
+Master 
+ssh ubuntu@3.142.209.215
+
+
+8. Pod Design
+============================
+8.2.  Jobs in Kubernetes
+============================
+To Perform the Given Job of Completion
+
+========================
+myjob1.yml    - Job Configuration
+========================
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: myjlc-job
+spec: 
+  completions: 3
+  template: 
+    spec: 
+      restartPolicy: Never
+      containers:
+        - name: myubuntu
+          image: ubuntu
+          command: ["expr","5","*","5"]
+            
+    
+========================================================
+scp myjob1.yml ubuntu@18.117.160.249:/home/ubuntu/pod-design
+========================================================
+kubectl create -f  myjob1.yml 
+
+kubectl get pods
+
+kubectl describe job myjlc-job
+
+kubectl delete job myjlc-job
+
+========================
+myjob2.yml    - Job Configuration
+========================
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jlc-job
+spec: 
+  completions: 3
+  parallelism: 3
+  template: 
+    spec: 
+      restartPolicy: Never
+      containers:
+        - name: myubuntu
+          image: ubuntu
+          command: ["expr","5","*","5"]
+            
+========================================================
+scp myjob2.yml ubuntu@18.117.160.249:/home/ubuntu/pod-design
+========================================================
+kubectl create -f  myjob2.yml 
+
+kubectl get pods
+
+kubectl describe job myjlc-job
+
+kubectl delete job myjlc-job

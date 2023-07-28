@@ -1,0 +1,11 @@
+Pod Design [ 20 % - CKAD  Exam]
+===============
+Labels, Selectors and Annotations
+
+Understand Deployments 
+How to perform rolling updates
+How to perform rollbacks
+Updating Deployments
+
+Understand Jobs 
+Understand CronJobs

@@ -1,0 +1,298 @@
+Master 
+ssh ubuntu@18.191.214.222
+
+
+Kubernetes supports many types of volumes. 
+
+A Pod can use any number of volume types simultaneously. 
+
+Ephemeral volume types have a lifetime of a pod, Persistent volumes exist beyond the lifetime of a pod. 
+
+When a pod ceases to exist, Kubernetes destroys ephemeral volumes; however, Kubernetes does not destroy persistent volumes. 
+
+For any kind of volume in a given pod, data is preserved across container restarts.
+
+Volume is a directory, possibly with some data in it, which is accessible to the containers in a pod. 
+
+=========================
+Types of Volumes 
+=========================
+Kubernetes supports several types of volumes.
+
+1) emptyDir
+2) hostPath 
+3) local
+4) awsElasticBlockStore 
+5) azureDisk
+6) azureFile 
+7) gcePersistentDisk 
+8) cephfs
+9) cinder 
+10) nfs 
+ etc
+============================
+1) emptyDir
+============================
+An emptyDir volume is first created when a Pod is assigned to a node, and exists as long as that Pod is running on that node. 
+
+As the name says, the emptyDir volume is initially empty.
+
+All containers in the Pod can read and write the same files in the emptyDir volume, though that volume can be mounted at the same or different paths in each container. 
+
+When a Pod is removed from a node for any reason, the data in the emptyDir is deleted permanently.
+==============
+mypod51.yml
+==============
+kind: Pod
+apiVersion: v1
+metadata:
+  name: jlcpod
+spec:
+ 
+ volumes:
+    - name: jlc-volume
+      emptyDir: {}  
+
+  containers:
+   - name: jlc1
+     image: ubuntu
+     command:
+      - "bin/bash"
+      - "-c"
+      - "sleep 10000"
+     volumeMounts:
+      - name: jlc-volume
+        mountPath: "/tmp/jlc1-data"
+
+   - name: jlc2
+     image: ubuntu
+     command:
+      - "bin/bash"
+      - "-c"
+      - "sleep 10000"
+     volumeMounts: 
+      - name: jlc-volume
+        mountPath: "/tmp/jlc2-data"
+
+=======================================
+scp mypod51.yml ubuntu@18.191.214.222:/home/ubuntu/myvolumes
+=============================
+
+kubectl create -f mypod51.yml
+
+kubectl get pods
+
+kubectl describe pod jlcpod
+
+kubectl exec jlcpod  -it -- sh
+
+kubectl exec jlcpod  -it -c jlc1 -- sh
+
+# echo "Hello Guys , I am from JLC1 " > /tmp/jlc1-data/hello.txt
+# cd /tmp/jlc1-data/
+# ls
+hello.txt
+# cat hello.txt
+Hello Guys , I am from JLC1
+#
+# exit
+
+kubectl exec jlcpod  -it -c jlc2 -- sh 
+# cd /tmp/jlc2-data/
+# ls
+hello.txt
+# cat hello.txt
+Hello Guys , I am from JLC1
+#
+# exit
+
+kubectl delete pod jlcpod 
+
+==============
+hostPath.
+==============
+=>  A hostPath volume mounts a file or directory from the host node's filesystem into your Pod. 
+
+============================
+mypod52.yml
+====================
+kind: Pod
+apiVersion: v1
+metadata:
+  name: jlcpod
+spec:
+  volumes:
+    - name: jlc-volume
+      hostPath:
+        path: /home/ubuntu/myjlcdata
+        type: Directory  
+
+  containers:
+   - name: jlc1
+     image: ubuntu
+     command:
+      - "bin/bash"
+      - "-c"
+      - "sleep 10000"
+     volumeMounts:
+      - name: jlc-volume
+        mountPath: "/tmp/jlc1-data"
+
+   - name: jlc2
+     image: ubuntu
+     command:
+      - "bin/bash"
+      - "-c"
+      - "sleep 10000"
+     volumeMounts: 
+      - name: jlc-volume
+        mountPath: "/tmp/jlc2-data"
+
+=======================================
+scp mypod52.yml ubuntu@18.191.214.222:/home/ubuntu/myvolumes
+=============================
+
+ssh ubuntu@3.141.44.199
+
+kubectl create -f mypod52.yml
+
+kubectl get pods
+
+kubectl describe pod jlcpod
+
+
+kubectl exec jlcpod  -it -c jlc1 -- sh
+
+# echo "Hello Guys , I am from JLC1 " > /tmp/jlc1-data/hello.txt
+# cd /tmp/jlc1-data/
+# ls
+hello.txt
+# cat hello.txt
+Hello Guys , I am from JLC1
+#
+# exit
+
+kubectl exec jlcpod  -it -c jlc2 -- sh 
+# cd /tmp/jlc2-data/
+# ls
+hello.txt
+# cat hello.txt
+Hello Guys , I am from JLC1
+#
+# exit
+kubectl delete pod jlcpod 
+
+=================
+awsElasticBlockStore
+=================
+=> awsElasticBlockStore volume mounts an Amazon Web Services (AWS) EBS volume into your pod. 
+
+=> Contents of an EBS volume are persisted and the volume is unmounted. 
+
+=> This means that an EBS volume can be pre-populated with data, and that data can be shared between pods.
+
+There are some restrictions when using an awsElasticBlockStore volume:
+
+=> Nodes on which pods are running must be AWS EC2 instances.
+=> Instances need to be in the same region and availability zone as the EBS volume
+
+Creating an AWS EBS volume
+=========================
+sudo apt  install awscli
+
+aws configure 
+
+ubuntu@Master:~$ aws configure
+AWS Access Key ID [****************ivas]: AKIAUWQ542TL64PZQM73
+AWS Secret Access Key [****************ivas]: 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
+Default region name [us-east-2]:
+Default output format [json]:
+
+~/.aws/config
+-----------------
+[default]
+region=us-east-2
+output=json
+
+~/.aws/credentials
+---------------------------
+[default]
+aws_access_key_id = AKIAUWQ542TL64PZQM73
+aws_secret_access_key = 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
+
+aws configure list
+
+aws ec2 create-volume --availability-zone=us-east-2b --size=2 --volume-type=gp2
+
+{
+    "AvailabilityZone": "us-east-2b",
+    "CreateTime": "2022-03-18T12:22:18.000Z",
+    "Encrypted": false,
+    "Size": 2,
+    "SnapshotId": "",
+    "State": "creating",
+    "VolumeId": "vol-0806f965cfa2a3253",
+    "Iops": 100,
+    "Tags": [],
+    "VolumeType": "gp2",
+    "MultiAttachEnabled": false
+}
+
+============================
+mypod53.yml
+====================
+kind: Pod
+apiVersion: v1
+metadata:
+  name: jlcpod
+spec:
+  volumes:
+    - name: jlc-volume
+       awsElasticBlockStore:
+          volumeID: "vol-0806f965cfa2a3253"
+          fsType: ext4
+
+  containers:
+   - name: jlc1
+     image: ubuntu
+     command:
+      - "bin/bash"
+      - "-c"
+      - "sleep 10000"
+     volumeMounts:
+      - name: jlc-volume
+        mountPath: "/myjlc/mydata"
+
+
+=======================================
+scp mypod53.yml ubuntu@18.191.214.222:/home/ubuntu/myvolumes
+=============================
+
+kubectl create -f mypod53.yml
+
+kubectl get pods
+
+kubectl describe pod jlcpod
+
+
+kubectl exec jlcpod  -it -- sh
+
+# echo "Hello Guys , I am from JLC1 " > /tmp/jlc1-data/hello.txt
+# cd /tmp/jlc1-data/
+# ls
+hello.txt
+# cat hello.txt
+Hello Guys , I am from JLC1
+#
+# exit
+
+kubectl delete pod jlcpod 
+
+To enable the AWS cloud provider 
+
+Add --cloud-provider=aws to the API Server, Controller Manager and every Kubelet.
+
+If you are using kubeadm, you can use the kubeadm config file to specify the Cloud Provider to configure during kubeadm init. This will add the right flag to the API Server and Controller Manager.  To add it to the kubelet, you need to drop in a file as /etc/systemd/system/kubelet.service.d/20-cloud-provider.conf containing: 
+
+[Service]
+Environment="KUBELET_EXTRA_ARGS=--cloud-provider=aws"

@@ -1,0 +1,249 @@
+Master :
+ssh ubuntu@3.140.216.112
+
+
+Configurations
+===========================
+8) SecurityContext in Kubernetes
+===========================
+A Security Context defines privilege and access control settings for a Pod or Container.
+
+ Security context settings include
+1) Discretionary Access Control: 
+	Permission to access an object, like a file, is based on user ID (UID) and group ID (GID).
+
+2) Running as privileged or unprivileged.
+
+3) Linux Capabilities: 
+	Give a process some privileges, but not all the privileges of the root user.
+
+etc
+
+
+===================
+mypod12.yml
+===================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  restartPolicy: Never
+  containers:
+    - name: myubuntu
+      image: ubuntu
+      command: ["sleep", "5000"]
+
+================================
+scp mypod12.yml ubuntu@3.140.216.112:/home/ubuntu/myconfig
+=======================================
+kubectl create -f mypod12.yml
+
+kubectl get pods
+
+kubectl exec -it jlcpod -- sh
+
+# ps aux
+root          1  0.6  0.0   2512   524 ?        Ss   11:37   0:00 sleep 5000
+
+#id
+uid=0(root) gid=0(root) groups=0(root)
+
+=>  runAsUser  : 0 (root) 
+=> runAsGroup : 0(root)
+=> fsGroup : 0(root)
+
+kubectl delete pod jlcpod 
+============================
+mypod13.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  restartPolicy: Never
+  securityContext:
+    runAsUser: 1000
+  containers:
+    - name: myubuntu
+      image: ubuntu
+      command: ["sleep", "5000"]
+
+================================
+scp mypod13.yml ubuntu@3.140.216.112:/home/ubuntu/myconfig
+=======================================
+kubectl create -f mypod13.yml
+
+kubectl get pods
+
+kubectl exec -it jlcpod -- sh
+
+# ps aux
+1000           1  0.0  0.0   2516   584 ?        Ss   11:15   0:00 sleep 5000
+
+$ id
+uid=1000 gid=0(root) groups=0(root)
+
+exit
+
+kubectl delete pod jlcpod 
+
+============================
+mypod14.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  restartPolicy: Never
+  securityContext:
+    runAsUser: 1000
+  containers:
+    - name: myubuntu
+      image: ubuntu
+      command: ["sleep", "5000"]
+      securityContext:
+        runAsUser: 2000
+
+================================
+scp mypod14.yml ubuntu@3.140.216.112:/home/ubuntu/myconfig
+=======================================
+kubectl create -f mypod14.yml
+
+kubectl get pods
+
+kubectl exec -it jlcpod -- sh
+
+# ps aux
+2000           1  0.0  0.0   2516   584 ?        Ss   11:19   0:00 sleep 5000
+
+$ id
+uid=2000 gid=0(root) groups=0(root)
+
+exit
+
+kubectl delete pod jlcpod 
+
+====================
+mypod15.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  restartPolicy: Never
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 2000
+    fsGroup: 3000
+  volumes:
+    - name: app-config-volume
+      configMap:
+        name: app-config
+    - name: db-config-volume
+      configMap:
+        name: db-config
+  containers:
+    - name: myubuntu
+      image: ubuntu
+      command: ["sleep", "5000"]
+      volumeMounts:
+        - name: app-config-volume
+          mountPath: /mydata/app-config
+        - name: db-config-volume
+          mountPath: /mydata/db-config
+      securityContext:
+        allowPrivilegeEscalation: false
+
+
+
+================================
+scp mypod15.yml ubuntu@3.140.216.112:/home/ubuntu/myconfig
+=======================================
+
+kubectl create -f mypod15.yml
+
+kubectl get pods
+
+kubectl describe pod jlcpod
+
+kubectl exec -it jlcpod -- sh
+
+# ps aux
+
+1000           1  0.0  0.0   2516   576 ?        Ss   11:32   0:00 sleep 5000
+
+# id
+uid=1000 gid=2000 groups=2000,3000
+
+# ls -l
+
+drwxr-xr-x   4 root root 4096 Mar  4 11:32 mydata
+
+# cd mydata
+# ls -l
+drwxrwsrwx 3 root 3000 4096 Mar  4 11:32 app-config
+drwxrwsrwx 3 root 3000 4096 Mar  4 11:32 db-config
+
+cd app-config
+# ls -l
+lrwxrwxrwx 1 root 3000 14 Mar  4 11:32 mycolor -> ..data/mycolor
+lrwxrwxrwx 1 root 3000 15 Mar  4 11:32 mycourse -> ..data/mycourse
+lrwxrwxrwx 1 root 3000 13 Mar  4 11:32 myname -> ..data/myname
+
+exit 
+
+kubectl delete pod jlcpod 
+
+====================
+mypod16.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  restartPolicy: Never
+  containers:
+    - name: myubuntu
+      image: ubuntu
+      command: ["sleep", "5000"]
+      securityContext:
+        capabilities:
+          add: ["NET_ADMIN", "SYS_TIME"]
+          drop: ["CHOWN", "KILL"]
+
+================================
+scp mypod16.yml ubuntu@3.140.216.112:/home/ubuntu/myconfig
+=======================================
+
+kubectl create -f mypod16.yml
+
+kubectl get pods
+
+kubectl describe pod jlcpod
+
+kubectl exec -it jlcpod -- sh
+
+# ps aux
+
+root           1  0.0  0.0   2516   580 ?        Ss   11:43   0:00 sleep 5000
+
+# id
+uid=0(root) gid=0(root) groups=0(root)
+
+
+apt-get update
+apt-get install --yes libcap2-bin
+capsh --print
+
+
+exit 
+
+kubectl delete pod jlcpod 
+
+
+

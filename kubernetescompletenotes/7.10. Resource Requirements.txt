@@ -1,0 +1,277 @@
+Master :
+ssh ubuntu@3.144.187.36
+
+Configurations
+============================
+10) Resource Requirements
+============================
+=> Consider 3-Node Kubernetes Cluster
+=> Each Node has its own Resources
+	- CPU
+	- Memory
+ 	- Disk
+
+=> Each Pod running in the Node consumes set of Resources
+	- 2 CPU
+	- 1 Memory
+	- 1 Diskspace
+
+=> Whenever Pod is placed on the Node, it consumes resources available on the Node.
+
+=> Kubernates Schedular decides which Node the Pod goes to
+
+=> Kubernates Schedular takes the following into Consideration while placing the Pod on the Node
+	1) Amount of Resources required for the Pod
+	2) Amount of Resources available on the Node
+
+=> If the Node has No sufficient Resources then Schedular avoids placing the Pod on that Node
+
+=> If there is No sufficient Resources available on any one of the Nodes  then Schedular pulls back the Scheduled Pod and Keeps the Pod state as Pending State.
+
+=> Kubernetes doesn’t provide any default resource limits for POD. 
+
+=> This means that unless you explicitly define limits, your containers can consume unlimited CPU and memory.
+
+Resource Requirements for Pod
+=========================
+CPU Specification
+----------------------
+0.1 cpu => 100millis
+1 cpu => 1000m
+
+1 cpu => 1 AWS vCPU
+1 cpu => 1 GCP Core
+1 cpu => 1 Azure Core
+
+2 cpu => 2 Core
+
+===========================
+Memory Specification
+----------------------
+1K => Kilo Bytes => 1000 Bytes
+1Ki => Kibi Bytes => 1024 Bytes
+
+1M => Mega Bytes => 1000 * 1000 => 10,00,000 Bytes
+1Mi => Mebi Bytes => 1024 * 1024 => 10,48,576 Bytes
+
+1G => Giga Bytes => 1000 * 1000 * 1000
+1Gi => Gibi Bytes   => 1024 * 1024 * 1024
+
+Specifing Resource Requirements
+============================
+mypod21.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: mynginx
+    image: nginx
+
+=======================================
+scp mypod21.yml ubuntu@3.144.187.36:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod21.yml
+
+kubectl get pods
+
+kubectl describe pod jlcpod
+
+=> You will not see any resource limits set for this Pod bydefault.
+
+kubectl delete pod jlcpod 
+============================
+mypod22.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: mynginx
+    image: nginx
+    resources:
+      requests:
+        memory: '1Gi'
+        cpu: "2"
+
+=======================================
+scp mypod22.yml ubuntu@3.144.187.36:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod22.yml
+
+kubectl get pods
+
+kubectl describe pod jlcpod
+
+ Requests:
+      cpu:        2
+      memory:     1Gi
+
+kubectl delete pod jlcpod 
+
+============================================
+mypod23.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: mynginx
+    image: nginx
+    resources:
+      requests:
+        memory: '1Gi'
+        cpu: "20"
+
+=======================================
+scp mypod23.yml ubuntu@3.144.187.36:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod23.yml
+
+kubectl get pods
+
+kubectl describe pod jlcpod 
+
+Status:       Pending
+
+   Requests:
+      cpu:        20
+      memory:     1Gi
+
+Conditions:
+  Type           Status
+  PodScheduled   False
+
+kubectl delete pod jlcpod 
+=====================================
+mypod24.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: mynginx
+    image: nginx
+    resources:
+      requests:
+        memory: '500Mi'
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "2"
+
+=======================================
+scp mypod24.yml ubuntu@3.144.187.36:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod24.yml
+
+kubectl get pods
+
+kubectl describe pod jlcpod
+
+  Ready:          True
+    Restart Count:  0
+    Limits:
+      cpu:     2
+      memory:  2Gi
+    Requests:
+      cpu:        500m
+      memory:     500Mi
+
+
+kubectl delete pod jlcpod  
+
+=============================
+Setting Default Limits with LimitRange
+
+kubectl get limitrange
+
+=====================================
+mem-limit.yml
+====================
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: mem-limit-range
+spec:
+  limits:
+  - default:
+      memory: 1Gi
+    defaultRequest:
+      memory: 256Mi  
+    type: Container
+
+=======================================
+scp mem-limit.yml ubuntu@3.144.187.36:/home/ubuntu/myconfig
+=============================
+kubectl create -f mem-limit.yml
+
+kubectl get limitrange
+
+kubectl describe limitrange mem-limit-range
+
+kubectl create -f mypod21.yml
+
+kubectl get pods
+
+kubectl describe pod jlcpod
+
+  Limits:
+      memory:  1Gi
+    Requests:
+      memory:     256Mi
+
+kubectl delete pod jlcpod 
+
+=====================================
+cpu-limit.yml
+====================
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-limit-range
+spec:
+  limits:
+  - default:
+      cpu: 2
+    defaultRequest:
+      cpu: 500m
+    type: Container
+
+=======================================
+scp cpu-limit.yml ubuntu@3.144.187.36:/home/ubuntu/myconfig
+=============================
+kubectl create -f cpu-limit.yml
+
+kubectl get limitranges
+
+kubectl describe limitrange cpu-limit-range
+
+===========================================
+
+kubectl create -f mypod21.yml
+
+kubectl get pods
+
+kubectl describe pod jlcpod
+
+  Limits:
+      cpu:     2
+      memory:  1Gi
+    Requests:
+      cpu:        500m
+      memory:     256Mi
+
+kubectl delete pod jlcpod 

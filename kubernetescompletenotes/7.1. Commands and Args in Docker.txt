@@ -1,0 +1,145 @@
+docker rm -f $(docker ps -aq) 
+docker image rm -f $(docker images -aq)
+
+
+Master :
+ssh ubuntu@18.117.160.249
+
+Configurations
+================================
+1) Commands and Arguments in Docker
+================================
+
+docker run -d --name=myjdk  openjdk
+
+docker run -d --name=myubuntu  ubuntu
+
+docker history openjdk
+docker history ubuntu
+
+===================
+mydockerFile1
+===================
+FROM openjdk:8
+LABEL maintainer Srinivas
+RUN mkdir /home/myjlc
+COPY Hello.java /home/myjlc
+WORKDIR /home/myjlc
+RUN javac Hello.java
+ENTRYPOINT ["java","Hello"]
+
+docker build -t myapp1 -f mydockerFile1 ./mycode
+
+docker history myapp1
+
+docker run -d --name=myjlc1 myapp1 
+
+docker logs myjlc1
+
+docker run -d --name=myjlc2 myapp1  Hello
+
+docker logs myjlc2
+
+docker run -d --name=myjlc3 myapp1  Hai
+
+docker logs myjlc3
+
+docker rm -f $(docker ps -aq) 
+
+===================
+mydockerFile2
+===================
+FROM openjdk:8
+LABEL maintainer Srinivas
+RUN mkdir /home/myjlc
+COPY Hello.java /home/myjlc
+WORKDIR /home/myjlc
+RUN javac Hello.java
+ENTRYPOINT ["java"]
+
+docker build -t myapp2 -f mydockerFile2 ./mycode
+
+docker run -d --name=myjlc1 myapp2 
+
+docker logs myjlc1
+
+docker run -d --name=myjlc2 myapp2 Hello
+
+docker logs myjlc2
+
+docker run -d --name=myjlc3 myapp2 Hai
+
+docker logs myjlc3
+
+docker rm -f $(docker ps -aq) 
+
+===================
+mydockerFile3
+===================
+FROM openjdk:8
+LABEL maintainer Srinivas
+RUN mkdir /home/myjlc
+COPY Hello.java /home/myjlc
+WORKDIR /home/myjlc
+RUN javac Hello.java
+ENTRYPOINT ["java"]
+CMD ["Hello"]
+
+docker build -t myapp3 -f mydockerFile3 ./mycode
+
+docker run -d --name=myjlc1 myapp3 
+
+docker logs myjlc1
+
+docker run -d --name=myjlc2 myapp3 Hello
+
+docker logs myjlc2
+
+docker run -d --name=myjlc3 myapp3 Hai
+
+docker logs myjlc3
+
+docker run -d --name=myjlc4 myapp3 Hello Test 
+
+docker logs myjlc4
+
+docker rm -f $(docker ps -aq) 
+
+docker run -d --entrypoint=myjava --name=myjlc5 myapp3 
+
+docker run -d --entrypoint=myjava --name=myjlc6 myapp3 Hello
+
+docker rm -f $(docker ps -aq) 
+
+===================
+mydockerFile4
+===================
+FROM openjdk:8
+LABEL maintainer Srinivas
+RUN mkdir /home/myjlc
+COPY *.java /home/myjlc
+WORKDIR /home/myjlc
+RUN javac *.java
+ENTRYPOINT ["java"]
+CMD ["Hello"]
+
+docker build -t myapp -f mydockerFile4 ./mycode/
+
+docker run -d --name=myjlc1 myapp
+
+docker logs myjlc1
+
+docker run -d --name=myjlc2 myapp Hai
+
+docker logs myjlc2
+
+docker run -d --name=myjlc3 myapp Test
+
+docker logs myjlc3
+
+docker run -d --entrypoint=myjava --name=myjlc4 myapp
+
+docker rm -f $(docker ps -aq) 
+
+
+

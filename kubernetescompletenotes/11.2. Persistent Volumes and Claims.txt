@@ -1,0 +1,123 @@
+Master 
+ssh ubuntu@18.221.255.32
+
+State Persistence
+===========================================
+11.2. Persistent Volumes(PV) and Persistent Volumes  Claims(PVC)
+===========================================
+
+=> A PersistentVolume (PV) is a piece of storage in the cluster that has been provisioned by an administrator or dynamically provisioned using Storage Classes. 
+
+=> It is a resource in the cluster just like a node is a cluster resource. PVs are volume plugins like Volumes, but have a lifecycle independent of any individual Pod that uses the PV
+
+=> A PersistentVolumeClaim (PVC) is a request for storage by a user.
+
+=> PVCs consume PV resources. 
+
+=> PVCs can request specific size and access modes (e.g., they can be mounted ReadWriteOnce, ReadOnlyMany or ReadWriteMany)
+
+==============
+mypv.yml - Persistent Volume(PV) Definition
+==============
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: myjlc-pv
+spec:
+   accessModes:
+    - ReadWriteOnce
+   capacity:
+     storage: 1Gi
+   hostPath:
+      path: /home/ubuntu/myjlcdata
+      type: Directory  
+
+
+=======================================
+scp mypv.yml ubuntu@18.221.255.32:/home/ubuntu/myvolumes
+=============================
+
+kubectl create -f mypv.yml 
+
+kubectl get persistentvolumes
+
+kubectl describe persistentvolume myjlc-pv
+
+kubectl delete persistentvolume myjlc-pv
+
+==============
+mypvc.yml - Persistent Volume Claim(PVC)  Definition 
+==============
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myjlc-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+
+
+=======================================
+scp mypvc.yml ubuntu@18.221.255.32:/home/ubuntu/myvolumes
+=============================
+
+kubectl create -f mypvc.yml 
+
+kubectl get persistentvolumeclaims
+
+kubectl describe persistentvolumeclaim myjlc-pvc
+
+kubectl delete persistentvolumeclaim myjlc-pvc
+
+============================
+mypod54.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+
+  volumes:
+    - name: jlc-volume
+      persistentVolumeClaim:
+        claimName: myjlc-pvc  
+
+  containers:
+   - name: jlc1
+     image: ubuntu
+     command:
+      - "bin/bash"
+      - "-c"
+      - "sleep 10000"
+     volumeMounts:
+      - name: jlc-volume
+        mountPath: "/tmp/jlc1-data"
+
+=======================================
+scp mypod54.yml ubuntu@18.221.255.32:/home/ubuntu/myvolumes
+=============================
+
+kubectl create -f mypod54.yml
+
+kubectl get pods
+
+kubectl describe pod jlcpod
+
+
+kubectl exec jlcpod  -it -- sh
+
+# echo "Hello Guys , I am from JLC1 " > /tmp/jlc1-data/jlc.txt
+# cd /tmp/jlc1-data/
+# ls
+hello.txt  jlc.txt
+# cat hello.txt
+Hello Guys , I am from JLC1
+# cat jlc.txt
+Hello Guys , I am from JLC1
+# exit
+
+kubectl delete pod jlcpod 

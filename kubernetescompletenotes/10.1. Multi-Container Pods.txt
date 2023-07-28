@@ -1,0 +1,74 @@
+Master :
+ssh ubuntu@18.117.190.156
+
+Multi-Container Pods
+================================
+10.1. Multi-Container Pods
+================================
+=> Kubernetes doesn’t run containers directly
+
+=> Kubernetes  wraps one or more containers into a higher-level structure called Pod. 
+
+=> Pod is a group of one or more containers that are deployed together on the same host. 
+
+=> Pod is deployed with with shared storage and network resources, and a specification for how to run the containers.
+
+=> Containers can easily communicate with other containers in the same pod as though they are on the same machine.
+
+
+=> If you need to run a single container in Kubernetes, then you have to create a pod for it which is nothing but Single Container Pod.
+
+=>  If you have to run two or more containers in a pod, then the pod created to place these containers is called a Multi Container Pod.
+
+=> Multi-Containers in Pods can share same lifecycle
+	*** Created together
+	*** Destroyed together
+	*** Access Same shared storage
+	*** Access Same network resources(Refer each other as localhost)
+
+============================
+mypod45.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  restartPolicy: Never
+  volumes:
+  - name: myjlc-volume
+    emptyDir: {}
+
+  containers:
+
+  - name: nginx-container
+    image: nginx
+    volumeMounts:
+    - name: myjlc-volume
+      mountPath: /usr/share/nginx/html
+
+  - name: ubuntu-container
+    image: ubuntu
+    volumeMounts:
+    - name: myjlc-volume
+      mountPath: /mydata
+    command: ["/bin/sh"]
+    args: ["-c", "echo Hello JLC Guys !!! How are you? > /mydata/index.html"]
+ 
+=======================================
+scp mypod45.yml ubuntu@18.117.190.156:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod45.yml
+
+kubectl get pods
+
+kubectl describe pod jlcpod
+
+
+kubectl exec jlcpod -c nginx-container --  cat /usr/share/nginx/html/index.html
+
+kubectl exec jlcpod -c ubuntu-container --  cat /mydata/index.html
+
+kubectl delete pod jlcpod
+

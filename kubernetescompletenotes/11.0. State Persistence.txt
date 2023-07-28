@@ -1,0 +1,17 @@
+================
+State Persistence – 8%
+================
+Kubernetes volumes
+Persistent volumes in Kubernetes
+Persistent Volume Claims for storage
+Creating a persistent volume claim
+Configure a Pod to use a persistent volume for storage
+
+StorageClasses: 
+StorageClass provides a way to describe the “classes” of storage offers available.
+
+PersistentVolume: 
+It is a piece of storage in the cluster that has been provisioned by an administrator or dynamically provisioned using StorageClasses. They are created over StorageClasses.
+
+PersistentVolumeClaim: 
+It is a request for storage by a user. They are created over PersistentVolumes.

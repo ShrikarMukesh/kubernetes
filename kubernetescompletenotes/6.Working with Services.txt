@@ -1,0 +1,203 @@
+Master :
+ssh ubuntu@18.117.160.249
+
+Kubernetes Services
+================
+=> An abstract way to expose an application running on a set of Pods as a network service.
+
+=> Kubernetes gives Pods their own IP addresses and a single DNS name for a set of Pods, and can load-balance across them.
+
+=> Kubernetes Pods are created and destroyed to match the state of your cluster. 
+=> Pods are nonpermanent resources. 
+=> If you use a Deployment to run your app, it can create and destroy Pods dynamically.
+
+=> Each Pod gets its own IP address, however in a Deployment, the set of Pods running in one moment in time could be different from the set of Pods running  a moment later.
+It means IP address of the Pods chage time to time.
+
+Service resources
+================
+=> In Kubernetes, a Service is an abstraction which defines a logical set of Pods.
+=> Set of Pods targeted by a Service is usually determined by a selector. 
+=>  Service abstraction enables the decoupling.
+
+Types of Kubernetes Services
+============================
+There are 4 types of Kubernetes Services 
+
+
+1) ClusterIP: 
+=============
+=> Exposes the Service on a cluster-internal IP. 
+=> ClusterIP is the default type of service, which is used to expose a service on an IP address internal to the cluster. 
+=> Access is only permitted from within the cluster.
+
+
+2) NodePort: 
+===========
+Exposes the Service on each Node's IP at a static port (the NodePort). 
+A ClusterIP Service, to which the NodePort Service routes, is automatically created. 
+
+You'll be able to contact the NodePort Service, from outside the cluster, by requesting <NodeIP>:<NodePort>.
+
+3) LoadBalancer: 
+Exposes the Service externally using a cloud provider's load balancer. 
+NodePort and ClusterIP Services, to which the external load balancer routes, are automatically created.
+
+4) ExternalName: 
+Maps the Service to the contents of the externalName field (e.g. lms.jlcindia.com), by returning a CNAME record with its value. 
+No proxying of any kind is set up.
+
+Working with Services
+==================
+kubectl get services
+kubectl explain services
+
+2) NodePort Service:
+----------------------------
+========================
+NodePort  Service Demo #1
+========================
+YAML Configuration file for Service: --- myservice.yml
+-------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: myjlc-service
+spec:
+  type: NodePort
+  selector:
+    app: jlcapp
+    tier: front-end
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 32000
+
+================================
+Node POrt Range = 30000 to 32767
+===============================
+ssh ubuntu@3.21.237.205
+
+scp mydeployment.yml ubuntu@3.139.54.153:/home/ubuntu/myapp
+scp myservice.yml ubuntu@3.139.54.153:/home/ubuntu/myapp
+
+kubectl create -f  mydeployment.yml
+kubectl create -f  myservice.yml
+
+kubectl get services
+
+kubectl get deployments
+
+kubectl get replicasets
+
+kubectl get pods
+
+kubectl get pods -o wide
+
+kubectl get pods --show-labels
+
+<NodeIP>:<NodePort>.
+
+http://3.139.54.153:32000/
+http://18.217.122.113:32000/
+http://18.117.134.99:32000/
+
+
+minikube service myjlc-service --url
+
+kubectl describe service myjlc-service
+
+
+kubectl delete service myjlc-service
+
+kubectl delete deployment myjlc-deployment
+========================================
+
+========================
+Jlcapp Deployment  - Demo
+========================
+YAML Configuration file for Deployment --- jlcapp-deployment.yml
+-------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jlcapp-deployment
+spec:
+  strategy:
+    type: RollingUpdate 
+  selector:
+    matchLabels:
+      app: myjlc-app
+      type: front-end
+  replicas: 10
+  template:
+    metadata:
+      name: myjlc-app
+      labels:
+        app: myjlc-app
+        type: front-end
+    spec:
+      containers:
+        - name: jlcapp-container
+          image: dandesclasses/myjlcapp:v1.0
+          ports:
+            - containerPort: 8080
+
+========================
+Jlcapp  Service Demo 
+========================
+YAML Configuration file for Service: --- jlcapp-service.yml
+-------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: jlcapp-service
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    app: myjlc-app
+    type: front-end
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 32000
+
+=================================================
+scp jlcapp-deployment.yml ubuntu@3.139.54.153:/home/ubuntu/myapp
+scp jlcapp-service.yml ubuntu@3.139.54.153:/home/ubuntu/myapp
+=================================================
+
+kubectl create -f  jlcapp-deployment.yml
+kubectl create -f  jlcapp-service.yml
+
+kubectl get services
+
+kubectl get deployments
+
+kubectl get pods -o wide
+
+kubectl get pods --show-labels
+
+<NodeIP>:<NodePort>.
+
+http://3.139.54.153:32000/myjlcapp
+http://18.217.122.113:32000/myjlcapp
+http://18.117.134.99:32000/myjlcapp
+
+MySQL Docker Image
+
+db- myjlcdb
+tables - mybooks
+insert some records
+
+MongoDB Docker Image
+
+db- myjlcdb
+tables - mybooks
+insert some records
+
+
+Next - Configuration
+
+

@@ -1,0 +1,9 @@
+kubectl apply -f mongodb-configmap.yaml
+
+kubectl apply -f mongodb-secret.yaml
+
+kubectl apply -f mongodb-deployment.yaml
+
+kubectl apply -f mongodb-service.yaml
+
+kubectl apply -f mongo-express-deployment.yaml

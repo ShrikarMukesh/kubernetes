@@ -1,0 +1,153 @@
+Master :
+ssh ubuntu@52.14.14.192
+
+Observability
+================================
+9.2. Readiness Probes
+================================
+=> Kubelet uses readiness probes to know when a container is ready to start accepting traffic. 
+
+=> Pod is considered ready when all of its containers are ready. One use of this signal is to control which Pods are used as backends for Services. 
+
+=> When a Pod is not ready, it is removed from Service load balancers.
+
+========================
+Container probes for Readiness
+========================
+1) httpGet
+-------------
+=> Performs an HTTP GET request against the Pod's IP address on a specified port and path.
+
+=> This Probe is considered successful if the response has a status code greater than or equal to 200 and less than 400.
+
+Ex:
+   readinessProbe:
+      httpGet:
+        path: /index.html
+        port: 80
+
+2) tcpSocket
+------------------
+=> Performs a TCP check against the Pod's IP address on a specified port. 
+=> This Probe is considered successful  if the port is open.
+
+Ex:
+  readinessProbe:
+      tcpSocket:
+        port: 8080
+
+3) exec
+------------
+=> Executes a specified command inside the container. 
+=> This Probe is considered successful if the command exits with a status code of 0.
+
+Ex:
+ readinessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/myjlcdata
+
+==================
+mypod36.yml
+==================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: mynginx
+    image: nginx
+    readinessProbe:
+      httpGet:
+        path: /index.html
+        port: 80
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      failureThreshold: 5 
+ 
+
+=======================================
+scp mypod36.yml ubuntu@52.14.14.192:/home/ubuntu/observability
+=============================
+
+kubectl create -f mypod36.yml
+
+kubectl get pods 
+
+kubectl describe pod jlcpod
+
+kubectl delete pod jlcpod
+
+
+============================
+mypod37.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: mynginx
+    image: nginx
+    readinessProbe:
+      httpGet:
+        path: /hello.html
+        port: 80
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      failureThreshold: 5
+ 
+
+=======================================
+scp mypod37.yml ubuntu@52.14.14.192:/home/ubuntu/observability
+=============================
+
+kubectl create -f mypod37.yml
+
+kubectl get pods 
+
+kubectl describe pod jlcpod
+
+kubectl delete pod jlcpod
+
+============================
+mypod38.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: mybusybox
+    image: k8s.gcr.io/busybox
+    args:
+    - /bin/sh
+    - -c
+    - touch /tmp/myreadiness; sleep 3000;
+    readinessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/myreadiness
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      failureThreshold: 5
+
+=======================================
+scp mypod38.yml ubuntu@52.14.14.192:/home/ubuntu/observability
+=============================
+
+kubectl create -f mypod38.yml
+
+kubectl get pods 
+
+kubectl describe pod jlcpod
+
+kubectl delete pod jlcpod
+
+
+

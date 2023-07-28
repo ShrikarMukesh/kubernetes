@@ -1,0 +1,142 @@
+Master :
+ssh ubuntu@52.14.14.192
+
+Observability
+================================
+9.4. Startup Probes
+================================
+=> Sometimes, you have to deal with legacy applications that might require an additional startup time on their first initialization. 
+
+=> You can set up a startup probe with the same command, HTTP or TCP check, with a failureThreshold * periodSeconds long enough to cover the worse case startup time.
+
+Ex:
+ livenessProbe:
+    httpGet:
+      path: /index.html
+      port: 8080
+    failureThreshold: 1
+    periodSeconds: 10
+
+  startupProbe:
+    httpGet:
+      path: /index.html
+      port: 8080
+    failureThreshold: 30
+    periodSeconds: 10 
+
+========================
+Container probes for Startup 
+========================
+1) httpGet
+-------------
+=> Performs an HTTP GET request against the Pod's IP address on a specified port and path.
+
+=> This Probe is considered successful if the response has a status code greater than or equal to 200 and less than 400.
+
+Ex:
+   startupProbe:
+      httpGet:
+        path: /index.html
+        port: 80
+
+2) tcpSocket
+------------------
+=> Performs a TCP check against the Pod's IP address on a specified port. 
+=> This Probe is considered successful  if the port is open.
+
+Ex:
+  startupProbe:
+      tcpSocket:
+        port: 8080
+
+3) exec
+------------
+=> Executes a specified command inside the container. 
+=> This Probe is considered successful if the command exits with a status code of 0.
+
+Ex:
+ startupProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/mydata
+
+==================
+mypod42.yml
+==================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: jlcapp
+    image: dandesclasses/myjlcapp:v1.0
+    ports:
+     - containerPort: 8080
+  livenessProbe:
+    httpGet:
+      path: /index.html
+      port: 8080
+    failureThreshold: 1
+    periodSeconds: 10
+
+  startupProbe:
+    httpGet:
+      path: /index.html
+      port: 8080
+    failureThreshold: 30
+    periodSeconds: 10 
+
+=======================================
+scp mypod42.yml ubuntu@52.14.14.192:/home/ubuntu/observability
+=============================
+
+kubectl create -f mypod42.yml
+
+kubectl get pods 
+
+kubectl describe pod jlcpod
+
+kubectl delete pod jlcpod
+
+==================
+mypod43.yml
+==================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: jlcapp
+    image: dandesclasses/myjlcapp:v1.0
+    ports:
+     - containerPort: 8080
+  livenessProbe:
+    httpGet:
+      path: /index.html
+      port: 8080
+    failureThreshold: 1
+    periodSeconds: 10
+
+  startupProbe:
+    httpGet:
+      path: /index.html
+      port: 8080
+    failureThreshold: 30
+    periodSeconds: 10 
+
+=======================================
+scp mypod43.yml ubuntu@52.14.14.192:/home/ubuntu/observability
+=============================
+
+kubectl create -f mypod43.yml
+
+kubectl get pods 
+
+kubectl describe pod jlcpod
+
+kubectl delete pod jlcpod
+
+

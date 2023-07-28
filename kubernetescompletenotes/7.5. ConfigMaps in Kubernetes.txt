@@ -1,0 +1,237 @@
+Master :
+ssh ubuntu@18.219.235.44
+
+Configurations
+=====================================
+5) ConfigMaps in Kubernetes
+=====================================
+=> To Centralize the Configuration Data
+
+kubectl get configmaps
+
+2 ways to Create ConfigMaps with Imperative Model
+============================
+1) Passing Individual Variables
+-------------------------------------
+kubectl create configmap app-config1 --from-literal=myname=Srinivas  --from-literal=mycolor=Red
+
+kubectl get configmaps
+
+kubectl get configmaps app-config1 -o yaml
+
+app-config1.yml
+================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config1
+  namespace: default
+data:
+  mycolor: Red
+  myname: Srinivas
+
+2) Passing Env Files
+-------------------------------------
+myconfig.env
+=============
+myname=Hello
+mycolor=Blue
+mycourse=Kubernates
+testMsg=OK OK
+
+================================
+scp myconfig.env ubuntu@18.117.241.94:/home/ubuntu/myconfig
+=============================
+
+kubectl create configmap app-config2 --from-env-file=myconfig.env
+
+kubectl get configmaps
+
+kubectl get configmaps app-config2 -o yaml
+
+dbconfig.env
+=============
+DB_USERNAME=myroot
+DB_PASSWORD=srinivas
+DB_DATABASE=myjlcdb
+DB_HOST=localhost
+
+================================
+scp dbconfig.env ubuntu@18.117.241.94:/home/ubuntu/myconfig
+=============================
+
+kubectl create configmap db-config --from-env-file=dbconfig.env
+
+kubectl get configmaps
+
+kubectl get configmaps db-config -o yaml
+
+Create ConfigMaps with Declarative Model
+============================
+myconfig-map.yml
+====================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  mycolor: Pink
+  mycourse: Kubernates
+  myname: Dandes
+
+=======================================
+scp myconfig-map.yml ubuntu@18.117.241.94:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f myconfig-map.yml
+
+kubectl get configmaps
+
+kubectl get configmaps app-config -o yaml
+
+Create POD by Injecting configmaps 
+===============
+mypod6.yml
+==============
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+  labels:
+    run: jlcpod
+spec:
+  containers:
+   - image: nginx
+     name: jlcpod
+     envFrom: 
+      - configMapRef:
+          name: app-config
+      - configMapRef:
+          name: db-config
+      
+ ================================
+scp mypod6.yml ubuntu@18.117.241.94:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod6.yml
+
+kubectl describe pod jlcpod
+
+kubectl exec jlcpod -- printenv
+
+kubectl exec jlcpod  -it -- sh
+
+/#  env
+
+/# exit
+
+kubectl delete pod jlcpod 
+
+==========================================================
+mypod7.yml
+==============
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+  labels:
+    run: jlcpod
+spec: 
+  containers:
+   - image: nginx
+     name: jlcpod
+     env: 
+      - name: JLC_NAME
+        valueFrom:
+          configMapKeyRef:
+            name: app-config
+            key: myname
+      - name: JLC_COURSE
+        valueFrom:
+          configMapKeyRef:
+            name: app-config
+            key: mycourse
+      - name: JLC_USERNAME
+        valueFrom:
+          configMapKeyRef:
+            name: db-config
+            key: DB_USERNAME
+      - name: JLC_PASSWORD
+        valueFrom:
+          configMapKeyRef:
+            name: db-config
+            key: DB_PASSWORD
+ ================================
+scp mypod7.yml ubuntu@18.219.235.44:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod7.yml
+
+kubectl describe pod jlcpod
+
+kubectl exec jlcpod -- printenv
+
+kubectl exec jlcpod  -it -- sh
+
+/#  env
+
+/# exit
+
+kubectl delete pod jlcpod 
+=========================================================================
+Config Map in Pod as Volume
+=============
+mypod8.yml
+==============
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+  labels:
+    run: jlcpod
+spec:
+  volumes:
+    - name: app-config-volume
+      configMap:
+        name: app-config
+    - name: db-config-volume
+      configMap:
+        name: db-config    
+  containers:
+    - name: jlcpod
+      image: nginx
+      volumeMounts: 
+        - name: app-config-volume
+          mountPath: /etc/app-config
+        - name: db-config-volume
+          mountPath: /etc/db-config
+
+ ================================
+scp mypod8.yml ubuntu@18.219.235.44:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod8.yml
+
+kubectl describe pod jlcpod
+
+kubectl exec jlcpod  -it -- sh
+
+
+/#  cd /etc/app-config
+/# ls
+
+/#  cd /etc/db-config
+/# ls
+
+/# exit
+
+kubectl delete pod jlcpod 
+=====================================================================
+"$(JLC_NAME)"
+$(JLC_COURSE) 
+$(JLC_USERNAME) 
+$(JLC_PASSWORD)
+
+kubectl get configmaps
+
+kubectl delete configmap app-config1

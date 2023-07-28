@@ -1,0 +1,132 @@
+Master :
+ssh ubuntu@18.191.206.86
+
+Configurations
+================================
+12) Node Selectors
+================================
+You can constrain a Pod so that it can only run on particular set of Node(s).
+
+You use label selectors to facilitate the selection. 
+
+You can define the Label on the Node
+You can use Selector in Pod definition.
+
+Ex:
+kubectl label nodes worker-1 appType=jlcbank
+kubectl label nodes worker-2 appType=jlcbank
+kubectl label nodes worker-3 appType=jlcbs
+
+kubectl label nodes worker-1 size=Large
+kubectl label nodes worker-2 size=Medium
+kubectl label nodes worker-3 size=Small
+
+kubectl label nodes worker-1 osType=Linux
+kubectl label nodes worker-2 osType=Linux
+kubectl label nodes worker-3 osType=Windows
+
+
+kubectl label nodes worker-1 myappType=jlcbank
+kubectl label nodes worker-2 myappType=jlcbs
+
+
+============================
+mypod28.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: mynginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  nodeSelector:
+    myappType: jlcbs
+
+
+=======================================
+scp mypod28.yml ubuntu@18.191.206.86:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod28.yml
+
+kubectl get pods -o wide
+
+kubectl get nodes -o wide --show-labels
+
+kubectl describe pod jlcpod
+
+kubectl delete pod jlcpod
+
+============================
+mypod29.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod1
+spec:
+  containers:
+  - name: mynginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  nodeSelector:
+    myappType: jlcbank
+
+
+=======================================
+scp mypod29.yml ubuntu@18.191.206.86:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod29.yml
+
+kubectl get pods -o wide
+
+kubectl get nodes --show-labels
+
+kubectl describe pod jlcpod1
+
+kubectl delete pod jlcpod1
+
+============================
+mypod30.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: mynginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  nodeSelector:
+    myappType: helloApp
+
+
+=======================================
+scp mypod30.yml ubuntu@18.191.206.86:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod30.yml
+
+kubectl get pods -o wide
+
+kubectl describe pod jlcpod
+
+kubectl delete pod jlcpod
+
+=================================
+Node Selector is Simplest way of Scheduling the Based on the Labels and Selectors.
+
+If you have complex Requirements like 
+=> size may be medium or small
+=> ostype may be windows
+
+then Node Selector is not suitable .
+You have Node Affinity for Complex Use Cases.
+
+
+

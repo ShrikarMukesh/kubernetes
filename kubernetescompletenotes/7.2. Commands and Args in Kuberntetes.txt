@@ -1,0 +1,117 @@
+docker rm -f $(docker ps -aq) 
+docker image rm -f $(docker images -aq)
+
+
+Master :
+ssh ubuntu@18.117.160.249
+
+Configurations
+=========================================
+2) Commands and Arguments in Kubernetes
+====================================
+
+docker tag 24ad2dee0feb dandesclasses/myapp
+
+docker login
+
+docker push dandesclasses/myapp
+
+===============
+mypod1.yml
+==============
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod1
+spec:
+  containers:
+  - name: myjlc1
+    image: dandesclasses/myapp
+
+================================
+scp mypod1.yml ubuntu@18.117.241.94:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod1.yml
+
+kubectl logs mypod1 
+
+kubectl describe pod mypod1
+
+===============
+mypod2.yml
+==============
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod2
+spec:
+  containers:
+  - name: myjlc2
+    image: dandesclasses/myapp
+    args: 
+      - "Hai"    
+
+================================
+scp mypod2.yml ubuntu@18.117.241.94:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod2.yml
+
+kubectl logs mypod2
+
+kubectl describe pod mypod2
+
+===============
+mypod3.yml
+==============
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod3
+spec:
+  containers:
+  - name: myjlc3
+    image: dandesclasses/myapp
+    args: 
+      - "Test"    
+
+================================
+scp mypod3.yml ubuntu@18.117.241.94:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod3.yml
+
+kubectl logs mypod3
+
+kubectl describe pod mypod3
+
+===============
+mypod4.yml
+==============
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod4
+spec:
+  containers:
+  - name: myjlc4
+    image: dandesclasses/myapp
+    command:
+      - "myjava"
+    args: 
+      - "Hello"    
+
+================================
+scp mypod4.yml ubuntu@18.117.241.94:/home/ubuntu/myconfig
+=============================
+
+kubectl create -f mypod4.yml
+
+kubectl logs mypod4
+
+kubectl describe pod mypod4
+
+
+
+

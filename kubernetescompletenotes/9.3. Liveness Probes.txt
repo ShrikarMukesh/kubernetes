@@ -1,0 +1,161 @@
+Master :
+ssh ubuntu@52.14.14.192
+
+Observability
+================================
+9.3. Liveness Probes
+================================
+=> Probles whether application is running successfully or failed because of any problem in the application
+
+=> Kubelet uses liveness probes to know when to restart a container. 
+
+=> For example, liveness probes could catch a deadlock, where an application is running, but unable to make progress. 
+
+=> Restarting a container in such a state can help to make the application more available despite bugs.
+
+========================
+Container probes for Liveness 
+========================
+1) httpGet
+-------------
+=> Performs an HTTP GET request against the Pod's IP address on a specified port and path.
+
+=> This Probe is considered successful if the response has a status code greater than or equal to 200 and less than 400.
+
+Ex:
+   livenessProbe:
+      httpGet:
+        path: /index.html
+        port: 80
+
+2) tcpSocket
+------------------
+=> Performs a TCP check against the Pod's IP address on a specified port. 
+=> This Probe is considered successful  if the port is open.
+
+Ex:
+     livenessProbe:
+      tcpSocket:
+        port: 8080
+
+3) exec
+------------
+=> Executes a specified command inside the container. 
+=> This Probe is considered successful if the command exits with a status code of 0.
+
+Ex:
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/mydata
+
+
+mypod39.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: mybusybox
+    image: k8s.gcr.io/busybox
+    args:
+    - /bin/sh
+    - -c
+    - touch /tmp/myreadiness; sleep 30; rm -rf /tmp/myreadiness; sleep 600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/myreadiness
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      failureThreshold: 5
+
+=======================================
+scp mypod39.yml ubuntu@52.14.14.192:/home/ubuntu/observability
+=============================
+
+kubectl create -f mypod39.yml
+
+kubectl get pods 
+
+kubectl describe pod jlcpod
+
+kubectl delete pod jlcpod
+
+============================
+mypod40.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: goproxy
+    image: k8s.gcr.io/goproxy:0.1
+    ports:
+    - containerPort: 8080
+    readinessProbe:
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 10
+    livenessProbe:
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 15
+      periodSeconds: 20
+
+=======================================
+scp mypod40.yml ubuntu@52.14.14.192:/home/ubuntu/observability
+=============================
+
+kubectl create -f mypod40.yml
+
+kubectl get pods 
+
+kubectl describe pod jlcpod
+
+kubectl delete pod jlcpod
+
+============================
+mypod41.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: goproxy
+    image: k8s.gcr.io/goproxy:0.1
+    ports:
+    - containerPort: 8080
+    readinessProbe:
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 10
+    livenessProbe:
+      tcpSocket:
+        port: 12345
+      initialDelaySeconds: 15
+      periodSeconds: 20
+=======================================
+scp mypod41.yml ubuntu@52.14.14.192:/home/ubuntu/observability
+=============================
+
+kubectl create -f mypod41.yml
+
+kubectl get pods 
+
+kubectl describe pod jlcpod
+
+kubectl delete pod jlcpod
+
+
+

@@ -1,0 +1,34 @@
+minikube start
+
+minikube dashboard
+
+Kubectl get nodes
+
+Kubectl get pods
+
+kubectl get services
+
+kubectl get replicaset
+
+kubectl get namespaces
+
+kubectl create deployment nginx-depl --image=nginx
+
+kubectl get deployment
+
+kubectl edit deployment nginx-depl
+ ->> kubectl get deployment
+ ->> Kubectl get pods (New Pod will be created after deployment edit)
+ ->> kubectl get replicaset (Old replicaset will be deleted and new one will be created)
+ 
+kubectl logs nginx-depl-7d459cf5c8-ljkj9 ( Pod logs)
+
+kubectl create deployment mongo-depl --image=mongo
+  -->> kubectl get pods
+  -->> kubectl describe pod mongo-depl-85ddc6d66-6qq6j
+  Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  70s   default-scheduler  Successfully assigned default/mongo-depl-85ddc6d66-6qq6j to minikube
+  Normal  Pulling    69s   kubelet            Pulling image "mongo"
+

@@ -1,0 +1,44 @@
+Master :
+ssh ubuntu@52.14.14.192
+
+Observability
+================================
+9.5. Container Logging
+================================
+mypod44.yml
+====================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jlcpod
+spec:
+  containers:
+  - name: jlc-c1
+    image: dandesclasses/myjlcapp:v1.0
+    ports:
+     - containerPort: 8080
+
+   
+=======================================
+scp mypod44.yml ubuntu@52.14.14.192:/home/ubuntu/observability
+=============================
+
+kubectl create -f mypod44.yml
+
+kubectl get pods 
+
+kubectl describe pod jlcpod
+
+kubectl logs jlcpod
+
+kubectl logs -f  jlcpod
+
+kubectl logs -f  jlcpod -c jlc-c1
+kubectl logs -f  jlcpod -c jlc-c2
+
+kubectl delete pod jlcpod
+
+
+
+
+

@@ -1,0 +1,89 @@
+Master :
+ssh ubuntu@18.117.250.254
+
+Worker -1 
+ssh ubuntu@3.144.196.32
+
+Worker -2
+ssh ubuntu@3.144.213.49
+
+About ReplicaSet
+===========================
+=> ReplicaSet ensures that a specified number of pod replicas are running at  any given time for High-Availability
+
+=> If the Pod is Crashed then ReplicaSet brings up another Pod Automatically.
+
+=> ReplicaSet spans across multiple nodes of Clustor 
+
+=> ReplicaSet maintains the Pod Replicas across the Clustor.
+
+=> ReplicaSet helps to Scale the Pods across the Cluster 
+
+=> ReplicaSet helps to main the load across the Cluster 
+
+
+kubectl explain rs
+kubectl explain replicaset
+
+========================
+Replica Set Demo #1 : 
+========================
+YAML Configuration file for ReplicaSet : -- myreplicaset1.yml
+-----------------------------------------------------------------------------
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: myjlc-replicaset
+  labels:
+    app: myjlc
+spec:
+  selector:
+    matchLabels:
+      app: myjlc
+  replicas: 5
+  template:
+    metadata:
+      name: myjlc-pod
+      labels:
+        app: myjlc
+    spec:
+      containers:
+        - name: myjlc-container
+          image: nginx
+          ports:
+            - containerPort: 8080
+
+
+===============================
+scp myreplicaset1.yml ubuntu@18.117.160.249:/home/ubuntu
+
+kubectl create -f  myreplicaset1.yml
+
+kubectl get replicasets
+
+kubectl get pods
+
+kubectl get pods -o wide
+
+kubectl get pods --show-labels
+
+kubectl get pods  -l app=myjlc
+
+kubectl get pods --show-labels -l app=myjlc
+
+kubectl describe replicaset myjlc-replicaset
+
+kubectl get pods --show-labels
+
+kubectl scale replicaset myjlc-replicaset --replicas=6
+
+kubectl get pods --show-labels
+
+kubectl scale replicaset myjlc-replicaset --replicas=3
+
+kubectl get pods --show-labels
+
+kubectl delete replicaset myjlc-replicaset
+
+
+

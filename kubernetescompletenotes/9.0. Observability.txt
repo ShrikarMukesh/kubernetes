@@ -1,0 +1,11 @@
+====================
+9) Observability 
+====================
+9.1. Understand Probes
+9.2. Readiness Probes 
+9.3. Liveness Probes
+9.4. Startup Probes
+9.5. Container Logging
+9.6. Monitor applications in Kubernetes
+
+
