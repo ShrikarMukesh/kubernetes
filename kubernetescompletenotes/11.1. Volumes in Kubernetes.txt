@@ -203,8 +203,8 @@ sudo apt  install awscli
 aws configure 
 
 ubuntu@Master:~$ aws configure
-AWS Access Key ID [****************ivas]: AKIAUWQ542TL64PZQM73
-AWS Secret Access Key [****************ivas]: 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
+AWS Access Key ID [****************ivas]: 
+AWS Secret Access Key [****************ivas]: 
 Default region name [us-east-2]:
 Default output format [json]:
 
@@ -217,8 +217,8 @@ output=json
 ~/.aws/credentials
 ---------------------------
 [default]
-aws_access_key_id = AKIAUWQ542TL64PZQM73
-aws_secret_access_key = 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
+aws_access_key_id = 
+aws_secret_access_key = 
 
 aws configure list
 
