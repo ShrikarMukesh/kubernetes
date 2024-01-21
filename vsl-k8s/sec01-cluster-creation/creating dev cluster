@@ -25,7 +25,7 @@ nodes:
 - role: worker
 - role: worker
 
---- cmds
+--- cmds-- 
 kind get clusters
 
 kind create cluster --config 

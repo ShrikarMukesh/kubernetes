@@ -1,5 +1,8 @@
 **pod: commands
 --------------------------
+deleting dev-cluster:
+kind delete cluster --name dev-cluster
+
 watch -t -x kubectl get pod
 kubectl create -f 01-simple.yaml
 kubectl delete pod my-pod
