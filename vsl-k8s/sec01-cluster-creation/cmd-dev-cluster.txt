@@ -1,0 +1,82 @@
+#kind create cluster --config kind-example-config.yaml
+#Multi-node clusters
+#In particular, many users may be interested in multi-node clusters. A simple configuration for this can be achieved with the following config file contents:
+
+# three node (two workers) cluster config
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+- role: worker
+- role: worker
+
+---
+#Control-plane HA
+You can also have a cluster with multiple control-plane nodes:
+
+# a cluster with 3 control-plane nodes and 3 workers
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+- role: control-plane
+- role: control-plane
+- role: worker
+- role: worker
+- role: worker
+
+--- cmds-- 
+kind get clusters
+
+kind create cluster --config 
+--This is response
+Creating cluster "dev-cluster" ...
+ ✓ Ensuring node image (kindest/node:v1.27.1) 🖼
+ ✓ Preparing nodes 📦 📦 📦  
+ ✓ Writing configuration 📜 
+ ✓ Starting control-plane 🕹️ 
+ ✓ Installing CNI 🔌 
+ ✓ Installing StorageClass 💾 
+ ✓ Joining worker nodes 🚜 
+Set kubectl context to "kind-dev-cluster"
+You can now use your cluster with:
+
+--- kubectl cluster-info --context kind-dev-cluster
+
+====================================================================================
+CMD Finding Linux Architecture
+dpkg --print-architecture (amd64)
+
+# For AMD64 / x86_64
+[ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.19.0/kind-linux-amd64
+
+chmod +x ./kind
+sudo mv ./kind /usr/local/bin/kind
+--------------------------------------------------------------------------------------------
+Kubectl: CLI tool to interact with k8s master/api server
+kubectl version --output=yaml
+------------------------------------------------------------------
+01-cluster-creation.yaml -->
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: dev-cluster
+nodes:
+- role: control-plane
+  extraPortMappings:
+  - containerPort: 30001
+    hostPort: 30001
+    protocol: TCP
+- role: worker
+- role: worker
+
+kind create cluster --name kind-2
+
+kind create cluster --config 01-cluster-creation.yaml
+-------------------------------------------------------------------
+Exploring Kind cluster
+docker exec -it <container-id> bash
+cmd: list of process --> ps -aux
+
+-----------------------------------------------------------------
+kind delete cluster --name dev-cluster

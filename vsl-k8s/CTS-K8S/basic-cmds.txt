@@ -1,3 +1,0 @@
-kubectl run nginx --image=nginx
-kubectl get pods
-kubectl describe pod nginx
