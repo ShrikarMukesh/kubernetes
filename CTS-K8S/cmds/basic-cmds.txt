@@ -5,3 +5,14 @@ kubectl describe pod nginx
 kubectl apply -f pod-postgres.yaml
 
 kubectl apply -f pod-nginx.yaml
+-----------------------------------------
+Create replicaset: 
+kubectl create -f replicaset-defination.yml
+
+Scale replicaset:
+kubectl replace -f replicaset-defination.yml 
+kubectl scale --replicas=6 -f replicaset-defination.yml
+kubectl scale --replicas=6 -f myapp-replicaset
+
+kubectl get replicaset
+kubectl delete replicaset myapp-replicaset
